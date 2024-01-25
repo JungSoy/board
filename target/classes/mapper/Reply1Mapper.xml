@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="reply1">
+		
+<!-- 댓글 등록 -->		
+	<insert id="addReply1" parameterType="hashMap">
+		  <selectKey keyProperty="rid1" resultType="java.lang.Integer" order="BEFORE">
+		    SELECT R1_SEQ.NEXTVAL FROM DUAL
+		  </selectKey>
+		  INSERT INTO reply1 (rid1, bid, rwriter1, rcontent1, rregdate1)
+		  VALUES (#{rid1}, #{bid}, #{rwriter1}, #{rcontent1}, sysdate)
+	</insert>
+	
+<!-- 댓글 조회 -->
+<select id="select_reply1" parameterType="String"
+		resultType="com.board.reply1.Reply1VO">
+		<![CDATA[
+			SELECT * 
+			FROM reply1
+			WHERE bid = #{bid}
+			AND r1del = 'n'
+			ORDER BY rid1 DESC
+		]]>
+	</select>
+		
+<!-- 댓글 수정 -->		
+	<update id="update" parameterType="com.board.reply1.Reply1VO">
+				UPDATE reply1 SET
+				rcontent1 = #{rcontent1}, rupdate1 = sysdate
+				WHERE rid1 = #{rid1}
+	</update>
+
+<!-- 댓글 삭제 -->
+	<update id="delete_reply1" parameterType="com.board.reply1.Reply1VO">
+				UPDATE reply1 SET
+				r1del='y'
+				WHERE rid1 = #{rid1}
+	</update>
+	
+		
+</mapper> 

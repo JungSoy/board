@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="reply2">
+		
+		
+<!-- 대댓글 등록 -->		
+	<insert id="addReply2" parameterType="hashMap">
+		  <selectKey keyProperty="rid2" resultType="java.lang.Integer" order="BEFORE">
+		    SELECT R2_SEQ.NEXTVAL FROM DUAL
+		  </selectKey>
+		  INSERT INTO reply2 (rid2, rid1, rwriter2, rcontent2, rregdate2)
+		  VALUES (#{rid2}, #{rid1}, #{rwriter2}, #{rcontent2}, sysdate)
+	</insert>
+	
+
+		
+<!-- 대댓글 수정 -->		
+	<update id="update" parameterType="com.board.reply2.Reply2VO">
+				UPDATE reply2 SET
+				rcontent2 = #{rcontent2}, rupdate2 = sysdate
+				WHERE rid2 = #{rid2}
+	</update>
+
+<!-- 대댓글 삭제 -->
+	<update id="delete_reply2" parameterType="com.board.reply2.Reply2VO">
+				UPDATE reply2 SET
+				r2del='y'
+				WHERE rid2 = #{rid2}
+	</update>
+
+
+</mapper> 

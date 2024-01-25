@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="user">
+		
+
+<insert id="insert" parameterType="com.board.user.UserVO">
+<![CDATA[
+	INSERT INTO usertable
+	(userid, uname, pw, uemail, phone, uregdate, adminck, addr1, addr2, addr3, point, money)
+	values
+	(#{userid}, #{uname}, #{pw}, #{uemail}, #{phone}, sysdate, 0, #{addr1}, #{addr2}, #{addr3}, 100000, 5000)
+]]>
+</insert>
+
+<!-- 아이디 중복검사 -->
+<select id="idCheck" resultType="int">
+
+	SELECT count(*) FROM usertable WHERE userid = #{userid}
+
+</select>
+
+<!-- 로그인 -->
+<select id="loginUser" resultType="com.board.user.UserVO">
+
+		SELECT * FROM usertable WHERE userid=#{userid}
+<!-- 		SELECT * FROM usertable WHERE userid=#{userid} and pw=#{pw} -->
+</select>
+      
+<select id="login_check" resultType="String">
+	<![CDATA[
+		SELECT uname FROM usertable WHERE userid=#{userid} and pw=#{pw}
+	]]>
+</select>
+		
+<select id="select_list" resultType="com.board.user.UserVO">
+	<![CDATA[
+		SELECT * FROM usertable ORDER BY userid DESC
+	]]>
+</select>
+
+<update id="update" parameterType="hashMap">
+	<![CDATA[
+		UPDATE usertable
+		SET
+		uname = #{uname}
+		pw = #{pw}
+		uemail = #{uemail}
+		phone = #{phone}
+		uregdate = #{uregdate}
+	]]>
+</update>
+
+<delete id="delete" parameterType="String">
+	<![CDATA[
+		DELETE FROM usertable
+		WHERE userid = #{userid}
+	]]>
+</delete>
+
+</mapper> 

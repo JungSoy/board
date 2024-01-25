@@ -1,0 +1,280 @@
+<script>
+
+//무한스크롤 막기 기능
+/*http://usejsdoc.org/
+*/
+var BaseNoticeListApp =function(){
+
+
+   
+  var USER_INFO = M.data.storage("USER_INFO");
+  
+  //페이지count   
+  var currPage =1;
+  
+  //로딩중임을 나타내는 플래그//동시에 동작?
+  var loading = false; 
+  
+  // 데이터를 모두 불러왔는지 여부를 나타내는 변수
+  var noMoreData = false; 
+  
+  var selectedCno;
+  
+
+  return{
+     //초기함수 호출 
+     init:function(){
+        //초기화 
+        init();
+        //이벤트 등록
+    
+        fnEvent();
+       
+     }
+  }
+  
+  function init(){
+     
+     console.log(USER_INFO);
+     //목록조회
+     fnGetSaleOrderRegList(currPage,selectedCno);
+     
+     fnselectOption1();
+
+  }
+  
+  
+  
+ 
+ 
+  function fnEvent(){
+     
+     $("#searchBtn").click(function() {
+          currPage = 1; // 조회 버튼 클릭 시 페이지 초기화
+        //페이징 있을때는
+          
+          //$("#baseNoticeList").empty();
+          fnGetSaleOrderRegList(currPage, selectedCno);
+        
+          // 스크롤을 맨 위로 이동
+          $("#scrollPage").animate({ scrollTop: 0 }, "slow");
+      });
+        
+       
+     $("#prodNm").keyup(function(e) {
+        if(e.keyCode == 13) { 
+        
+           fnGetSaleOrderRegList(currPage, selectedCno);
+        }
+     })
+     
+     
+   //류가 변할때
+     $("#company").change(function(){
+        currPage = 1; // 조회 버튼 클릭 시 페이지 초기화
+        selectedCno = $(this).val(); //선택한 카테고리 값
+        //console.log(selectedCno);
+       
+        fnGetSaleOrderRegList(currPage, selectedCno);
+     });
+    
+     
+     $("#scrollPage").on("scroll", function() {
+//        currPage = 1; // 조회 버튼 클릭 시 페이지 초기화
+         var scrollTop = $(this).scrollTop();
+         var containerHeight = $(this).height();
+         var contentHeight = $("#baseNoticeList").height();
+         
+         if(noMoreData){
+            return;
+         }else{
+         
+         if (scrollTop + containerHeight >= contentHeight) {
+             currPage++; // 페이지 증가
+             console.log(currPage);
+             fnGetSaleOrderRegList(currPage, selectedCno);
+          // 데이터를 로드하는 중에는 스크롤 이벤트를 무시하도록 설정
+             loading = true;
+         }}
+     });
+     
+     
+  }
+
+  
+  
+  
+  
+
+  //목록조회 
+  function fnGetSaleOrderRegList(currPage, selectedCno){
+     if(currPage == 1){
+         $("#baseNoticeList").html("");
+         noMoreData = false;
+     }
+   
+     //지점코드
+     selectedCno = selectedCno || '00';
+       var PROD_HNAME2 = $("#prodNm").val();
+ 
+
+     $.indicator.start();
+      
+     Http.send({
+        path: '/m/base/notice/list',
+        data: {
+           I_SALES_GROUP_LVL2     :USER_INFO.SALES_GROUP_LVL2,   //로그인 안의 지점코드 가져오기
+            I_CD_SALES_GROUP       :USER_INFO.CD_SALES_GROUP,    //부서코드 가져오기
+            I_CD_INFO              :selectedCno,  //구분
+            I_INFO_NAME            :PROD_HNAME2, //제목
+            I_PAGE_NUMBER          :currPage
+        },
+        paging:false,
+        success: function(result){
+           console.log(result);
+           
+           
+               
+           if(result.result_code == "200"){
+           
+              if(result.O_RESULT_CODE == "OK"){
+                 
+                   if(result.result_info.length > 0){
+                      $.each(result.result_info, function(i, v) {
+                   
+                         var data= result.result_info[i];
+                           //console.log(data);
+                         
+                         var $li = $('<li>'
+                               + '   <div class="item3">'
+                               + '      <div class="devide9 red3 fs13">'
+                               + '         <div class="fbold">' + data.INFO_NAME + '</div>'
+                               + '      </div>'
+                               + '      <div class="op">' 
+                               +'  <div class="flex3 fs13 disflex ">'
+                               +'<div class="flex3 after">' 
+                               +'<div></div>'+'<span>'+data.NM_SALES_GROUP +'</span>'
+                               +'<div></div>'+'<span>'+data.NM_PERSON +'</span>'
+                               +     '   </div>'
+                               +'<div class="col">' +data.DT_INFO +'</div>'
+                               +     '   </div>'
+                               +     '   </div>'
+                               + '   </div>'
+                                + '</li>');
+                            
+                         $li.data("rowdata",data);
+                         
+                          $li.click(function(){
+                            var rowdata = $(this).data("rowdata");
+                            Popup.open({
+                               url      : './base_notice_view.html',
+                               id       : 'baseNoticeViewPopup',
+                               data     : {
+                                  DT_INFO: rowdata.DT_INFO,
+                                  INFO_SEQ:rowdata.INFO_SEQ,
+                                  CD_SALES_GROUP:rowdata.CD_SALES_GROUP,
+                                  NO_PERSON:rowdata.NO_PERSON,
+                                  CD_INFO:rowdata.CD_INFO,
+                                  INFO_NAME:rowdata.INFO_NAME,
+                                  NM_PERSON:rowdata.NM_PERSON,
+                                  NM_SALES_GROUP:rowdata.NM_SALES_GROUP
+//                                  NM_INFO:rowdata.NM_INFO,
+                                 // DT_INSERT:rowdata.DT_INSERT
+//                                  INFO_DETAIL:rowdata.INFO_DETAIL,
+//                                  ID_INSERT:rowdata.ID_INSERT,
+//                                  DT_UPDATE:rowdata.DT_UPDATE,
+//                                  ID_UPDATE:rowdata.ID_UPDATE
+                               },
+                               title    : "공지사항상세",
+                               callback : function(data) {
+                                  
+                               } 
+                            });
+                         });
+                         $("#baseNoticeList").append($li);
+                      }); //for문 끝
+                      
+                      
+                   } else if (currPage === 1) {  
+                      var $li = $('<li class="none">조회결과가 없습니다.</li>');
+                      $("#baseNoticeList").append($li);              
+                   }
+                   else{
+                 noMoreData = true; ///조회결과가 없습니다.가 안나오게 하는 것
+              }
+              loading = false; // 로딩 작업이 완료되면 loading을 false로 설정
+           }else{
+              $.indicator.message(2000,result.O_RESULT_MESSAGE,function(){
+                 $.indicator.end();
+              }); 
+           }
+           } else {
+              $.indicator.message(2000, data.result_code+"에러 입니다.",function(){
+                 $.indicator.end();
+              });
+           }
+        }
+     });
+     $.indicator.end();
+     
+
+  }   
+  
+  
+  
+  
+  //유형구분
+  function fnselectOption1(){
+
+  $("#company").html("");
+  //$("#company").prepend('<option value="">전체</option>');
+     $.indicator.start();
+     Http.send({
+        path: '/m/base/notice/select',
+        data: {
+           I_CD_MASTER : 'SSC13'
+        },
+        success: function(result){
+        //console.log(result);
+           if(result.O_RESULT_CODE == "OK"){
+              var data = result.result_info;
+              if(data.length > 0){
+                 for(var i=0; i<data.length; i++){
+                    var row = data[i];
+                   // console.log(row.CD_DETAIL);
+                    var $option = $('<option value="'+row.CD_DETAIL+'">'+row.NM_DETAIL+'</option>');
+                    $("#company").append($option);
+                 } 
+                 //브랜드별 조회
+                 //fnselectOption2($("#company").val());
+              }else{
+                 var $option = $("<option/>",{text:"종류가 없습니다."});
+                 $("#company").append($option);
+              }
+           }else{
+              $.indicator.message(2000, data.O_RESULT_NAME+"에러 입니다.",function(){
+                 $.indicator.end();
+              });
+           }
+        }//success끝
+     });
+  $.indicator.end();
+       
+  }//유형구분 끝
+  
+  
+  
+  
+}();
+
+
+
+M.onReady(function(e) {
+  BaseNoticeListApp.init();
+});
+
+M.onBack(function() {
+  App.BackBtn();
+});
+
+</script>

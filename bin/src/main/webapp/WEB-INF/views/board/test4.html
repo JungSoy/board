@@ -1,0 +1,110 @@
+<script>
+
+$("#company").change(function(){
+    var selectedCno = $(this).val(); //선택한 카테고리 값
+    console.log(selectedCno);
+    fnGetSaleOrderRegList(currPage);
+ });
+ 
+ function fnGetSaleOrderRegList(currPage){
+      
+   
+      //지점코드
+      var PROD_HNAME = $("#company").val();
+    if(PROD_HNAME=='') PROD_HNAME='00';
+    var PROD_HNAME2 = $("#prodNm").val();
+  
+
+      $.indicator.start();
+          
+      Http.send({
+         path: '/m/base/notice/list',
+         data: {
+            I_SALES_GROUP_LVL2     :USER_INFO.SALES_GROUP_LVL2,   //로그인 안의 지점코드 가져오기
+             I_CD_SALES_GROUP       :USER_INFO.CD_SALES_GROUP,    //부서코드 가져오기
+             I_CD_INFO              :PROD_HNAME,  //구분
+             I_INFO_NAME            :PROD_HNAME2, //제목
+             I_PAGE_NUMBER          :1
+         },
+         success: function(result){
+            console.log(result);
+              $("#baseNoticeList").empty();
+                
+            if(result.result_code == "200"){
+                
+               if(result.O_RESULT_CODE == "OK"){
+                    if(result.result_info.length > 0){
+                       $.each(result.result_info, function(i, v) {
+                          
+                          var data= result.result_info[i];
+                            //console.log(data);
+                          
+                          var $li = $('<li>'
+                                + '   <div class="item3">'
+                                + '      <div class="devide9 red3 fs13">'
+                                + '         <div class="fbold">' + data.INFO_NAME + '</div>'
+                                + '      </div>'
+                                + '      <div class="op">' 
+                                +'  <div class="flex3 fs13 disflex ">'
+                                +'<div class="flex3 after">' 
+                                +'<div></div>'+'<span>'+data.NM_SALES_GROUP +'</span>'
+                                +'<div></div>'+'<span>'+data.NM_PERSON +'</span>'
+                                +     '   </div>'
+                                +'<div class="col">' +data.DT_INFO +'</div>'
+                                +     '   </div>'
+                                +     '   </div>'
+                                + '   </div>'
+                                 + '</li>');
+                             
+                          $li.data("rowdata",data);
+                          
+                           $li.click(function(){
+                             var rowdata = $(this).data("rowdata");
+                             Popup.open({
+                                url      : './base_notice_view.html',
+                                id       : 'baseNoticeViewPopup',
+                                data     : {
+                                   DT_INFO: rowdata.DT_INFO,
+                                   INFO_SEQ:rowdata.INFO_SEQ,
+                                   CD_SALES_GROUP:rowdata.CD_SALES_GROUP,
+                                   NO_PERSON:rowdata.NO_PERSON,
+                                   CD_INFO:rowdata.CD_INFO,
+                                   INFO_NAME:rowdata.INFO_NAME,
+                                   NM_PERSON:rowdata.NM_PERSON,
+                                   NM_SALES_GROUP:rowdata.NM_SALES_GROUP
+//                                   NM_INFO:rowdata.NM_INFO,
+                                  // DT_INSERT:rowdata.DT_INSERT
+//                                   INFO_DETAIL:rowdata.INFO_DETAIL,
+//                                   ID_INSERT:rowdata.ID_INSERT,
+//                                   DT_UPDATE:rowdata.DT_UPDATE,
+//                                   ID_UPDATE:rowdata.ID_UPDATE
+                                },
+                                title    : "공지사항상세",
+                                callback : function(data) {
+                                   
+                                } 
+                             });
+                          });
+                          $("#baseNoticeList").append($li);
+                       });  
+                    } else {  
+                       var $li = $('<li class="none">조회결과가 없습니다.</li>');
+                       $("#baseNoticeList").append($li);              
+                    }
+            }else{
+               $.indicator.message(2000,result.O_RESULT_MESSAGE,function(){
+                  $.indicator.end();
+               }); 
+            }
+            } else {
+               $.indicator.message(2000, data.result_code+"에러 입니다.",function(){
+                  $.indicator.end();
+               });
+            }
+         }
+      });
+      $.indicator.end();
+      
+
+   }   
+   </script>

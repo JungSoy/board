@@ -1,0 +1,303 @@
+<script>
+
+
+/** Copyright (c) 2023 EanSoft RND, Inc.
+ * 
+ * Application Name :  [BaseProdListApp]
+ * Description      : 제품정보 목록
+ * Revision History
+ * Author         Date            Description
+ * ------------      -------------      ------------------
+ * RSH          2023. 09. 22.        First Draft.
+ */
+
+var BaseProdListApp = function(){
+   
+   
+   var USER_INFO = M.data.storage("USER_INFO");
+   
+   //페이지count
+   var pageCount=1;
+   
+   //로딩중임을 나타내는 플래그
+   var loading = false; 
+   
+   // 데이터를 모두 불러왔는지 여부를 나타내는 변수
+   var noMoreData = false; 
+   
+   return{
+      //초기함수 호출
+      init:function(){
+         //초기화
+         init();
+         
+         //이벤트 등록
+         fnEvent();
+      },
+   }
+   function init(){
+      //류별조회
+      fnselectOption1();
+      
+      //F브랜드 조회 
+      fnselectOption3();
+      
+      //목록조회
+      fnGetProdList(pageCount);
+      
+   }
+   
+   //이벤트 등록
+   function fnEvent(){
+      
+      // 조회하기 버튼
+      $("#searchBtn").click(function() { 
+         pageCount=1;
+         fnGetProdList(pageCount);
+      });
+      
+      // 조회하기 엔터
+      $("#searchBtn").keyup(function(e) { 
+         if(e.keyCode==13){
+            pageCount=1;
+            fnGetProdList(pageCount);
+         }
+      });
+      
+      $("#prodNm").keyup(function(e) {
+         if(e.keyCode == 13) { 
+            pageCount=1;
+            fnGetProdList(pageCount);
+         }
+      })
+      
+      //류가 변할때
+      $("#ryu").change(function(){
+         fnselectOption2($(this).val());
+      });
+      
+      
+       // 스크롤 이벤트 핸들러 등록
+       $("#scrollPage").scroll(function() {
+            var scrollTop =  $("#scrollPage").scrollTop();
+            var containerHeight = $("#scrollPage").height();
+            var contentHeight = $("#baseProdList").height();
+            
+            if(noMoreData){
+               return;
+            }else{
+               if (scrollTop + containerHeight >= contentHeight - 100 && !loading) {
+                  pageCount++;
+                  
+                   fnGetProdList(pageCount);
+                   
+                   // 데이터를 로드하는 중에는 스크롤 이벤트를 무시하도록 설정
+                   loading = true;
+               }
+            }
+            
+            
+        });
+      
+      
+   }
+   
+   //류별조회
+   function fnselectOption1() {
+      $("#ryu").html("");
+      $("#ryu").prepend('<option value=""  data-item_type_code="">전체</option>');
+      $.indicator.start();
+      Http.send({
+         path: '/m/base/prod/getProdRyu',
+         data: {
+         },
+         success: function(result){
+            if(result.result_code == "200"){
+               var data = result.result_info;
+               if(data.length > 0){
+                  for(var i=0; i<data.length; i++){
+                     var row = data[i];
+                     var $option = $('<option value="'+row.DESC1+'" data-item_type_code="'+row.ITEM_TYPE_CODE+'">'+row.NM_ITEM_TYPE+'</option>');
+                     $("#ryu").append($option);
+                  }
+                  //브랜드별 조회
+                  fnselectOption2($("#ryu").val());
+               }else{
+                  var $option = $("<option/>",{text:"종류가 없습니다."});
+                  $("#ryu").append($option);
+               }
+            }else{
+               $.indicator.message(2000, data.result_code+"에러 입니다.",function(){
+                  $.indicator.end();
+               });
+            }
+         }//success끝
+      });
+   $.indicator.end();
+      
+   }//류별조회 끝
+   
+   //F브랜드조회
+   function fnselectOption3(){
+      $("#fbrand").html("");
+      $("#fbrand").prepend('<option value="">전체</option>');
+      $.indicator.start();
+         Http.send({
+            path:'/m/base/prod/getProdfBrand',
+            data:{
+            },
+            success:function(result){
+               if(result.result_code == "200"){
+                  var data = result.result_info;
+                  if(data.length > 0){
+                     for(var i=0; i<data.length; i++){
+                        var row = data[i];
+                        var $option = $("<option/>",{text:row.NM_F_BRAND,value:row.F_BRAND});
+                        $("#fbrand").append($option);
+                     }
+                  }else{
+                     var $option = $("<option/>",{text:"F브랜드가 없습니다."});
+                     $("#fbrand").append($option);
+                  }
+               }else{
+                  $.indicator.message(2000, data.result_code+"에러 입니다.",function(){
+                     $.indicator.end();
+                  });
+               }
+            },
+         });
+   $.indicator.end();
+      
+   }//F브랜드조회 끝
+   
+   //브랜드별조회
+   function fnselectOption2(ITEM_TYPE_CODE) {
+      $("#brand").html("");
+      $("#brand").prepend('<option value="">전체</option>');
+      if(ITEM_TYPE_CODE !=""){
+         $.indicator.start();
+         Http.send({
+            path:'/m/base/prod/getProdBrand',
+            data: {
+               I_BRAND_CODE: ITEM_TYPE_CODE
+            },
+            success: function(result) {
+                console.log(result);
+               if(result.result_code == "200"){
+                  var data = result.result_info;
+                  if(data.length > 0){
+                     $("#brand").html("");
+                     $("#brand").prepend('<option value="">전체</option>');
+                  
+                     for(var i=0; i<data.length; i++){
+                        var row = data[i];
+                        var $option = $("<option/>",{text:row.NM_BRAND,value:row.BRAND_CODE});
+                        
+                        $("#brand").append($option);
+                     }//for문 끝
+                  }else{
+                     var $option = $("<option/>",{text:"브랜드가 없습니다."});
+                     $("#brand").append($option);
+                  }
+               }else{
+                  $.indicator.message(2000, data.result_code+"에러 입니다.",function(){
+                     $.indicator.end();
+                  });
+               }
+            },
+         });
+         $.indicator.end();
+      }
+   }
+   
+   //목록조회
+   function fnGetProdList(pageCount){ 
+      if(pageCount == 1){
+           $("#baseProdList").html("");
+           noMoreData = false;
+      }
+      //제품코드 제품평
+      var PROD_HNAME = $("#prodNm").val();
+      
+      //류별코드
+      var Ryu_ITEM_TYPE_CODE= $("#ryu option:selected").data("item_type_code");
+      //FBRAND코드
+      var F_BRAND_CODE=$("#fbrand").val();
+      //BRAND코드
+      var BRAND_CODE = $("#brand").val();
+      $.indicator.start();
+      Http.send({
+         path: '/m/base/prod/getProdList',
+         data: {   
+            I_NM_ITEM:PROD_HNAME,
+            I_BARCODE:"",
+            I_ITEM_TYPE_CODE:Ryu_ITEM_TYPE_CODE,
+            I_F_BRAND:F_BRAND_CODE,
+            I_BRAND_CODE:BRAND_CODE,
+            I_PAGE_NUMBEER:pageCount
+         },
+         target:"#baseProdListLi",
+         arrayKey: "result",
+         paging:false,
+         success: function(result) {
+            if(result.result_code == "200"){
+               var data = result.result_info;
+               if(data.length > 0){
+                  for(var i=0; i<data.length; i++){
+                     var row = data[i];
+                     var $li=$("<li><div class='item3'><div class='devide'><strong>"+row.NM_STANDARD+"</strong><div>"+row.E_PRICE+"</div></div><div class='op'>"+row.NM_ITEM+"</div></div></li>");
+                     
+                     $li.data("rowdata",row);
+                     $li.click(function(){
+                        //팝업창
+                        var rowdata = $(this).data("rowdata");
+                        Popup.open({
+                           url:'../base/base_prod_view.html', //경로 -제품상세
+                           id:'baseProdPopup',
+                           data:{
+                              I_CD_ITEM: rowdata.CD_ITEM//제품코드
+                           },
+                           title:"제품상세",         //미입력시 html에 입력된 값 유지
+                           callback:function(html){
+                              
+                           }
+                        });
+                     });
+                     
+                     $(".devide div").html(row.E_PRICE.comma());
+                     $("#baseProdList").append($li);
+                     
+                  }//for문끝
+                  
+               } else if (pageCount === 1) {
+                   // 결과가 없을 때만 메시지 표시
+                  $("#baseProdList").html("");
+                   var $li = $("<li class='none'>조회결과가 없습니다.</li>");
+                   $("#baseProdList").append($li);
+               }else{
+                  noMoreData = true;
+               }
+               loading = false; // 로딩 작업이 완료되면 loading을 false로 설정
+            }else{
+               $.indicator.message(2000, data.result_code+"에러 입니다.",function(){
+                  $.indicator.end();
+               });
+            }
+         },
+
+         
+      });
+      
+   $.indicator.end();
+   }
+   
+}();
+M.onReady(function(e) {
+   BaseProdListApp.init();
+});
+
+M.onBack(function() {
+   App.BackBtn();
+});   
+
+</script>

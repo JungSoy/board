@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org/DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="board">
+	<select id="selectBoardList" parameterType="b" resultType="b">
+			select * from
+            (select rownum as rnum, b.* from 
+            (select
+					board_no as boardNo,
+					category_no as categoryNo,
+					board_title as boardTitle,
+					board_writer as boardWriter,
+					reg_date as regDate,
+					read_count as readCount,
+                    category_name as categoryName
+				from board_tbl join board_category using(category_no) order by 1 desc)b)
+                where rnum between #{start} and #{end}
+	</select>
+	<select id="selectBoardListSearch" parameterType="b" resultType="b">
+			select * from
+            (select rownum as rnum, b.* from 
+            (select
+					board_no as boardNo,
+					category_no as categoryNo,
+					board_title as boardTitle,
+					board_writer as boardWriter,
+					reg_date as regDate,
+					read_count as readCount,
+                    category_name as categoryName
+				from board_tbl join board_category using(category_no)
+				where   1=1   
+	      		<!--만약 if문에서 조건을 잘못 적을 경우에 부적합한 열 인덱스 에러가 발생할 수 있음을 주의   -->
+				<if test="categoryNo != null and !''.equals(categoryNo)">
+					and category_No = #{categoryNo}
+				</if>
+				<if test="searchType != null and !''.equals(searchType)">
+	                <if test="'title'.equals(searchType)"><!--문자열 비교이므로 searchType == title  -->
+	                	and lower(board_title) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+	                <if test="'writer'.equals(searchType)">
+	                	and lower(board_writer) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+	                <if test="'content'.equals(searchType)">
+	                	and lower(board_content) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+                </if>
+                <!--***전체 조회가 안되었을 때 categoryNo의 and와 바로 아래의 and와 코드가 겹쳐버려서 카테고리별 조회가 안되는 현상이 발생함  
+                	따라서 겹치지 않도로 하단의 and 다음에 나오는 전체 조건을 ()로 감싸줌으로써 코드가 겹치지 않도록 해주면서 해결이 됨
+                	***and로 연결하면서 조건이 꼬일 수가 있는지 확인할 필요가 있음-->
+                <!--SQL문에서 오류가 나가나 이상하다 싶을경우 SQL log를 찍어보는게 좋음 그러면 어디가 문제 있는지 발견할 가능성이 높음 -->
+           		 <if test="searchType == null or ''.equals(searchType)">
+	              and ((lower(board_title) like lower('%'||#{searchKeyWord}||'%')) or
+                	(lower(board_writer) like lower('%'||#{searchKeyWord}||'%'))or
+                	(lower(board_content) like lower('%'||#{searchKeyWord}||'%')))
+		           </if>
+                order by 1 desc)b)
+                where rnum between #{start} and #{end}
+	</select>
+	<select id="selectTotalCount" parameterType="b" resultType="_int">
+		select count(*) 
+			from board_tbl 
+			where 1=1
+				 <if test="categoryNo != null and !''.equals(categoryNo)"> 
+					and category_no = #{categoryNo}
+				 </if>
+				 
+				<if test="searchType != null and !''.equals(searchType) "><!--searchType이 비어있지 않고 키워드 검색  -->
+	                <if test="'title'.equals(searchType)">
+	                	and lower(board_title) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+	                <if test="'writer'.equals(searchType)">
+	                	and lower(board_writer) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+	                <if test="'content'.equals(searchType)">
+	                	and lower(board_content) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+                </if>
+              <if test="searchType == null or ''.equals(searchType) ">
+                	and ((lower(board_title) like lower('%'||#{searchKeyWord}||'%')) or
+                	(lower(board_writer) like lower('%'||#{searchKeyWord}||'%'))or
+                	(lower(board_content) like lower('%'||#{searchKeyWord}||'%')))
+               </if>
+	</select>
+	<insert id="insertBoard" parameterType="b">
+		insert into board_tbl values
+		(board_tbl_seq.nextval,#{categoryNo},#{boardTitle},#{boardContent},#{boardWriter},to_char(sysdate,'yyyy-mm-dd'),#{readCount})
+		<selectKey resultType="_int" order="AFTER" keyProperty="boardNo"><!-- keyProperty는 위에서 사용한 파라미터 값 -->
+			select max(board_no) from board_tbl<!-- 가장 최근에 게시물 인서트 된것이 보드 넘버가 가장 크므로 -->
+		</selectKey>
+	</insert>
+	<insert id="insertFile" parameterType="f">
+		insert into file_tbl values(file_tbl_seq.nextval, #{boardNo},#{filename},#{filepath})
+	</insert>
+	<select id="selectOneBoard" parameterType="_int" resultType="b">
+		select
+			board_no as boardNo,
+			category_no as categoryNo,
+			board_title as boardTitle,
+			board_content as boardContent,
+			board_writer as boardWriter,
+			reg_date as regDate,
+			read_count as readCount,
+            category_name as categoryName
+		 from board_tbl join board_category using(category_no) where board_no=#{_parameter}
+	</select>
+	<select id="selectFileList" parameterType="_int" resultType="f">
+		select 
+			file_no as fileNo,
+			board_no as boardNo,
+			file_name as filename,
+			file_path as filepath
+		from file_tbl
+		where board_no=#{_parameter}
+	</select>
+	<!-- <resultMap type="b" id="getBoard"> --><!-- 여기서 아이디는 연결용임 -->
+	<!-- resultMap은  위에서 selectOneBoard에서 조회한 것과 selectFileList의 결과를 동시에 처리하기 위한 것인데
+	selectOneBoard에서 먼저 조회한 것을 resultMap="getBoard"을 이용해서 resultMap의 result에 넘겨주고 
+	여기에서 boardNo를 가지고 selectFileList를 collection통해 결과를 처리할것인데 column은 넘겨받은 값이고 ofType에는
+	결과를 받을 것중에 "f"타입이 있고 javaType은 ArrayList로 결과를 가져오겠다라는 뜻임 -->
+	<!-- 	<result column="board_no" property="boardNo"/>
+		<result column="category_no" property="categoryNo"/>
+		<result column="board_title" property="boardTitle"/>
+		<result column="board_content" property="boardContent"/>
+		<result column="board_writer" property="boardWriter"/>
+		<result column="reg_date" property="regDate"/>
+		<result column="read_count" property="readCount"/>
+		<result column="category_name" property="categoryName"/>
+		<collection property="fileList" 
+					select="selectFileList"
+					column="board_no"
+					ofType="f"
+					javaType="java.util.ArrayList"
+		/>
+	</resultMap> -->
+	<select id="selectFileCount" parameterType="b" resultType="_int">
+		select count(*) from file_tbl where board_no=#{boardNo}
+	</select>
+	<!-- board update를 위한것 -->
+	<update id="updateBoard" parameterType="b">
+		update board_tbl set 
+			category_no=#{categoryNo},
+			board_title=#{boardTitle},
+			board_content=#{boardContent}
+		where board_no=#{boardNo}
+	</update>
+	<!--DB에 있는 file_tbl에서의 파일을 지워주기 위함 -->
+	<delete id="deleteFile" parameterType="_int">
+		delete  from file_tbl where file_no = #{_parameter}
+	</delete>
+	<!-- 게시판 삭제 -->
+	<delete id="deleteBoard" parameterType="_int">
+		delete from board_tbl where board_no = #{_parameter}
+	</delete>
+	<!-- 파일조회하기 -->
+	<select id="selectOneFile" parameterType="_int" resultType="f">
+		select 
+			file_no as fileNo,
+			board_no as boardNo,
+			file_name as filename,
+			file_path as filepath
+		from file_tbl
+		where file_no = #{fileNo}
+	</select>
+	<!--조회수 증가하기  -->
+	<update id="updateReadCount" parameterType="_int"><!--파라미터가 boardNo로  1개 보내주기 때문에 서브쿼리를 이용하여 read_count를 따로 조회해와야 한다  -->
+		<!-- update board_tbl set
+			read_count = (select 
+							read_count 
+						 from board_tbl 
+						 where board_no= #{boardNo}
+						)+1
+			where board_no = #{boardNo} -->
+			update board_tbl set
+			read_count = read_count+1 where board_no=#{boardNo} 
+	</update>
+	
+	<!-- insertComment 댓글 등록하기 -->
+	<insert id="insertComment" parameterType="bc">
+		insert into board_comment 
+			values(board_comment_seq.nextval,#{commentWriter},#{commentContent},to_char(sysdate,'yyyy-mm-dd'),#{boardRef},
+			<if test="boardCommentRef==0">null</if>
+			<if test="boardCommentRef!=0">#{boardCommentRef}</if>
+			,#{depth})
+	<!-- 여기서  boardCommentRef를 그냥 넣어주면 안됨 그냥 넣게 되면 오라클에서 무결성 제약조건이 위배되었습니다- 부모 키가 없습니다 오류가 나옴-->
+	</insert>
+	
+	<!--해당 게시물의  댓글 조회  -->
+	<select id="selectBoardComment" parameterType="_int" resultType="bc">
+		select 
+			board_comment_no as boardCommentNo,
+			comment_writer as commentWriter,
+			comment_content as commentContent,
+			comment_date as commentDate,
+			board_ref  as boardRef,
+			board_comment_ref as boardCommentRef
+			
+			from board_comment
+			where board_ref = #{_parameter} and board_comment_ref is null order by 1
+	</select>
+	
+	<!-- deleteComment 댓글 삭제 -->
+	<delete id="deleteComment" parameterType="_int">
+		delete from board_comment where board_comment_no=#{_parameter}
+	</delete>
+	
+	<!-- updateComment 댓글 수정 -->
+	<update id="updateBoardComment" parameterType="bc">
+		update board_comment set 
+			comment_content = #{commentContent}
+			where board_comment_no=#{boardCommentNo}
+	</update>
+	
+	<!-- 대댓글 리스트 조회 -->
+	<select id="selectRecommentList" parameterType="_int" resultType="bc">
+		select
+			board_comment_no as boardCommentNo,
+			comment_writer as commentWriter,
+			comment_content as commentContent,
+			comment_date as commentDate,
+			board_ref  as boardRef,
+			board_comment_ref as boardCommentRef
+			from board_comment
+			where board_ref=#{_parameter} and 
+				  board_comment_ref is not null order by 1
+	</select>
+	<!-- Excel에서 조회할 board 리스트 -->
+	<!--모든 컬럼을 조회시 *표시를 쓸 경우 인식을 못해 null point가 나올 수 있음-->
+	<select id="selectExcelBoardList" parameterType="b" resultType="b">
+		select * from
+            (select rownum as rnum, b.* from 
+            (select
+					board_no as boardNo,
+					category_no as categoryNo,
+					board_title as boardTitle,
+					board_writer as boardWriter,
+					reg_date as regDate,
+					read_count as readCount,
+                    category_name as categoryName
+				from board_tbl join board_category using(category_no)
+				where   1=1   
+	      		<!--만약 if문에서 조건을 잘못 적을 경우에 부적합한 열 인덱스 에러가 발생할 수 있음을 주의   -->
+				<if test="categoryNo != null and !''.equals(categoryNo)">
+					and category_No = #{categoryNo}
+				</if>
+				<if test="searchType != null and !''.equals(searchType)">
+	                <if test="'title'.equals(searchType)"><!--문자열 비교이므로 searchType == title  -->
+	                	and lower(board_title) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+	                <if test="'writer'.equals(searchType)">
+	                	and lower(board_writer) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+	                <if test="'content'.equals(searchType)">
+	                	and lower(board_content) like lower('%'||#{searchKeyWord}||'%')
+	                </if>
+                </if>
+                <!--***전체 조회가 안되었을 때 categoryNo의 and와 바로 아래의 and와 코드가 겹쳐버려서 카테고리별 조회가 안되는 현상이 발생함  
+                	따라서 겹치지 않도로 하단의 and 다음에 나오는 전체 조건을 ()로 감싸줌으로써 코드가 겹치지 않도록 해주면서 해결이 됨
+                	***and로 연결하면서 조건이 꼬일 수가 있는지 확인할 필요가 있음-->
+                <!--SQL문에서 오류가 나가나 이상하다 싶을경우 SQL log를 찍어보는게 좋음 그러면 어디가 문제 있는지 발견할 가능성이 높음 -->
+           		 <if test="searchType == null or ''.equals(searchType)">
+	              and ((lower(board_title) like lower('%'||#{searchKeyWord}||'%')) or
+                	(lower(board_writer) like lower('%'||#{searchKeyWord}||'%'))or
+                	(lower(board_content) like lower('%'||#{searchKeyWord}||'%')))
+		           </if>
+                order by 1 desc)b)
+	</select>
+	<!-- 조회했는지 체크 확인 -->
+	<select id="selectCntCheckHit" parameterType="ch" resultType="_int">
+		select
+			count(*) from check_hit 
+		where board_no=#{boardNo} and hit_user=#{hitUser}
+	</select>
+	<!--조회했으면  조회한 아이디와 조회된 boardNo 삽입 -->
+	<insert id="insertCheckHit" parameterType="ch">
+		insert into check_hit values(#{boardNo},#{hitUser}) 
+	</insert>
+</mapper>

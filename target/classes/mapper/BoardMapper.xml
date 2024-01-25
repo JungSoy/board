@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="board">
+		
+		
+		<!-- 검색 조건문 -->
+	<sql id="criteria">
+		<trim prefix="AND (" suffix=")" prefixOverrides="OR">
+			<foreach collection="typeArr" item="type">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'T'.toString()">
+							btitle like '%'||#{keyword}||'%' 
+						</when>
+						<when test="type == 'C'.toString()">
+							bcontent like '%'||#{keyword}||'%' 
+						</when>
+						<when test="type == 'W'.toString()">
+							userid like '%'||#{keyword}||'%' 
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	
+	</sql>
+	
+	
+<!-- 게시글 등록 -->		
+<insert id="addBoard" parameterType="com.board.board.BoardVO">
+	<selectKey keyProperty="bid" resultType="java.lang.Integer" order="BEFORE">
+    	SELECT B_SEQ.NEXTVAL FROM DUAL
+ 	</selectKey>
+  
+  INSERT INTO board (bid, userid, btitle, bcontent, bregdate, cno)
+  VALUES (#{bid}, #{userid}, #{btitle}, #{bcontent}, sysdate, #{cno})
+  
+</insert>
+
+<!-- 파일 업로드 -->
+<!-- <update id="addFile" parameterType="java.util.List"> -->
+<!-- 	<foreach collection="list" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" "> -->
+<!-- 		INTO filetable VALUES (#{item.bid}, #{item.fileName}, #{item.uploadPath}, #{item.uuid}) -->
+<!-- 	</foreach> -->
+<!-- </update> -->
+
+<insert id="addFile" parameterType="com.board.board.FileVO">
+  INSERT INTO filetable (bid, fileName, uploadPath, uuid)
+  VALUES (#{bid}, #{fileName}, #{uploadPath}, #{uuid})
+</insert>
+
+<!-- 전체 게시글 조회 -->
+<select id="select_list" resultType="com.board.board.BoardVO">
+	   
+ 	SELECT * FROM board 
+  
+</select>
+
+
+<!-- 게시글 하나 조회 -->
+<select id="select_one" resultType="com.board.board.BoardVO">
+	   
+	 select b.bid, c.cate, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate
+	 from board b, category c 
+	 where b.cno=c.cno and b.bid = #{bid}
+ 
+</select>
+
+<!-- 게시글 수정 -->
+	<update id="update" parameterType="com.board.board.BoardVO">
+				UPDATE board SET
+				btitle = #{btitle}, bcontent = #{bcontent}, bupdate = sysdate, cno = #{cno}
+				WHERE bid = #{bid}
+	</update>
+<!-- 게시글 삭제 -->
+	<update id="delete" parameterType="com.board.board.BoardVO">
+				UPDATE board SET
+				del = 'y'
+				WHERE bid = #{bid}
+	</update>
+	
+<!-- 게시글 전체 목록(페이징, 카테고리) 1 -->	
+<!-- <select id="select_listpaging" resultType="com.board.board.BoardVO"> -->
+<!--     <![CDATA[ -->
+<!--     SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate -->
+<!--     FROM ( -->
+<!--         SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, cno -->
+<!--         FROM board  -->
+<!--         WHERE rownum <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER} -->
+<!--         ]]> -->
+<!--         <if test="keyword != null"> -->
+<!--             <include refid="criteria"></include> -->
+<!--         </if> -->
+<!--         <![CDATA[ -->
+<!--          	AND del='n') b, category c  -->
+<!--         WHERE rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER} -->
+<!--         	AND c.cno=b.cno -->
+<!--     ]]> -->
+<!--     	 <if test="cno != null and cno > 0"> -->
+<!--         	AND c.cno = #{c.cno} -->
+<!--         </if>	 -->
+<!-- </select>  -->
+
+<!-- 게시글 목록 쿼리 수정 전 2 -->
+<!-- <select id="select_listpaging" resultType="com.board.board.BoardVO"> -->
+<!--     <![CDATA[ -->
+<!--     SELECT b.rn, b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate -->
+<!--     FROM ( -->
+<!--         SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, cno -->
+<!--         FROM board  -->
+<!--         WHERE rownum <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER} -->
+<!--         ]]>  -->
+<!--         <if test="cno != null and cno > 0"> -->
+<!--         	AND cno = #{cno} -->
+<!--         </if> -->
+<!--         <if test="keyword != null"> -->
+<!--             <include refid="criteria"></include> -->
+<!--         </if> -->
+<!--         <![CDATA[ -->
+<!--          	AND del='n' -->
+<!--          	ORDER BY bid DESC) b  -->
+<!--         INNER JOIN category c ON c.cno=b.cno -->
+<!--         WHERE rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER} -->
+<!--         ORDER BY b.bid DESC -->
+<!--     ]]> -->
+<!-- </select>  -->
+
+<!--게시물 목록 페이징 에러 수정 후 -->
+<select id="select_listpaging" resultType="com.board.board.BoardVO">
+    <![CDATA[
+    SELECT d.rn, d.bid, d.btitle, d.bcontent, d.userid, d.bregdate, d.bupdate, d.cate
+    FROM (
+        
+        SELECT a.rn, a.bid, a.btitle, a.bcontent, a.userid, a.bregdate, a.bupdate, a.cate
+        FROM(
+	    
+	        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, c.cate
+	        FROM board b 
+	        LEFT JOIN category c ON b.cno = c.cno
+	        WHERE del='n'
+	        ]]> 
+	        <if test="cno != null and cno > 0">
+	        	AND c.cno = #{cno}
+	        </if>
+	        <if test="keyword != null">
+	            <include refid="criteria"></include>
+	        </if>
+	        <![CDATA[
+	         	ORDER BY bid ASC) a
+	         	
+		WHERE a.rn <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
+		ORDER BY a.bid ASC) d
+		
+	WHERE d.rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER}
+	ORDER BY d.bid ASC
+    ]]>
+</select> 
+
+<!-- 게시글 전체 목록(엑셀 다운) -->	
+<select id="select_listexcel" resultType="com.board.board.BoardVO">
+SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate
+FROM (
+    SELECT bid, btitle, bcontent, userid, bregdate, bupdate, cno
+    FROM board 
+    WHERE del='n'
+    <if test="cno != null and cno > 0">
+         AND cno = #{cno}
+    </if>
+    <if test="keyword != null">
+        <include refid="criteria"></include>
+    </if>
+	) b
+INNER JOIN category c ON c.cno=b.cno
+</select> 
+
+<!-- <select id="select_listexcel" resultType="com.board.board.BoardVO"> -->
+<!-- 	SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate -->
+<!-- 	FROM board b -->
+<!-- 	WHERE  -->
+<!-- 		 <if test="cno != null and cno > 0"> -->
+<!-- 	         AND cno = #{cno} -->
+<!-- 	    </if> -->
+<!-- 	    <if test="keyword != null"> -->
+<!-- 	        <include refid="criteria_excel"></include> -->
+<!-- 	    </if> -->
+<!-- 		AND del='n' -->
+<!-- </select>  -->
+
+<!-- 왜 안됨..? del='n' 위치..? -->
+<!-- <select id="select_listexcel" resultType="com.board.board.BoardVO"> -->
+<!-- SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate -->
+<!-- FROM ( -->
+<!--     SELECT bid, btitle, bcontent, userid, bregdate, bupdate, cno -->
+<!--     FROM board  -->
+<!--     WHERE  -->
+<!--     <if test="cno != null and cno > 0"> -->
+<!--          cno = #{cno} -->
+<!--     </if> -->
+<!--     <if test="keyword != null"> -->
+<!--         <include refid="criteria_excel"></include> -->
+<!--     </if> -->
+<!-- 	AND del='n') b -->
+<!-- INNER JOIN category c ON c.cno=b.cno -->
+<!-- </select>  -->
+
+<!-- 첨부파일 조회 -->
+<select id="select_file" resultType="com.board.board.FileVO">
+	<![CDATA[
+		SELECT * 
+		FROM filetable
+		WHERE bid = #{bid}
+	]]>
+</select>	
+	
+
+
+<!-- 카테고리 조회 -->
+<select id="select_listcate" resultType="com.board.category.CategoryVO">
+	select cno, cate from category
+</select> 
+
+<!-- (수정 후) 게시물 총 개수 -->
+ <select id="getTotal" resultType="int">
+    
+        SELECT count(*) FROM board
+        WHERE del ='n'
+        <if test="keyword != null">
+        	AND bid > 0 <include refid="criteria"></include> 
+        </if>
+    
+ </select>
+ 
+<!-- (수정 전) 게시물 총 개수 -->
+<!--  <select id="getTotal" resultType="int"> -->
+    
+<!--         select count(*) from board -->
+        
+<!--         <if test="keyword != null"> -->
+<!--         	where bid > 0 <include refid="criteria"></include>  -->
+<!--         </if> -->
+    
+<!--  </select> -->
+ 
+	
+<!-- 댓글 조회 -->
+	<select id="select_reply1" resultType="com.board.reply1.Reply1VO">
+		<![CDATA[
+			SELECT * 
+			FROM reply1
+			WHERE bid = #{bid}
+			AND r1del = 'n'
+			ORDER BY rid1 DESC
+		]]>
+	</select>	
+	
+<!-- 대댓글 조회 -->
+	<select id="select_reply2" resultType="com.board.reply2.Reply2VO">
+		<![CDATA[
+			SELECT * 
+			FROM reply2
+			WHERE rid1 = #{rid1}
+			AND r2del = 'n'
+			ORDER BY rid2 DESC
+		]]>
+	</select>	
+	
+	
+	
+	
+<!-- (댓글)게시판 id불러오기 -->
+	<select id="getBidName" resultType="com.board.board.BoardVO">
+	
+		select bid, btitle from board 
+		where bid = #{bid}
+	
+	
+	</select>
+	
+
+
+
+
+
+
+<!-- 게시글 전체 목록(페이징)-카테고리별 조회 적용 -->	
+<!-- <select id="select_catepaging" resultType="com.board.board.BoardVO">
+    <![CDATA[
+    SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate
+    FROM (
+        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, cno
+        FROM board 
+        WHERE rownum <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
+        ]]>
+        <if test="cno != null and !''.equals(cno)">
+        	AND cno = #{cno}
+        </if>
+        <if test="keyword != null">
+            <include refid="criteria"></include> 
+        </if>
+        <![CDATA[
+         ) b 
+        INNER JOIN category c ON c.cno=b.cno
+        WHERE rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER}
+    ]]>
+</select>  -->
+
+
+
+
+<!-- 카테고리별 조회(페이징) -->
+<!-- <select id="select_catepaging" resultType="com.board.board.BoardVO">
+  <![CDATA[
+  SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate
+  FROM (
+      SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, cno
+      FROM board 
+      WHERE rownum <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
+  ]]>
+  <if test="keyword != null">
+      <include refid="criteria"></include>
+  </if>
+  <![CDATA[
+   ) b 
+  INNER JOIN category c ON c.cno=b.cno
+  WHERE rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER}
+  ]]>
+   
+  <if test="cno != null">
+      AND b.cno = #{cno, jdbcType=INTEGER}
+  </if>
+  
+</select>  -->
+
+
+ <!-- <select id="select_catepaging" resultType="com.board.board.BoardVO">
+    <![CDATA[
+    SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate
+    FROM (
+        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, cno
+        FROM board 
+        WHERE rownum <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
+        AND cno=#{cno}
+         ]]>
+        <if test="cno != null and !''.equals(cno)">
+        
+        </if>
+        
+        
+          <![CDATA[
+        ) b 
+        INNER JOIN category c ON c.cno=b.cno 
+        WHERE rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER}
+    ]]>
+</select>   -->
+
+
+ <!-- 게시글 전체 목록(페이징) -->	
+<!-- <select id="select_listpaging" resultType="com.board.board.BoardVO">
+<![CDATA[
+        
+        select bid, btitle, bcontent, userid, bregdate, bupdate
+        	from(
+                select rownum  as rn, bid, btitle, bcontent, userid, bregdate, bupdate, cno
+                  
+                from board where rownum <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
+    
+    ]]>
+    	  <if test="keyword != null">
+                    <include refid="criteria"></include> 
+          </if>
+          
+     <![CDATA[
+     			)
+     			
+        where rn > (#{pageNum, jdbcType=INTEGER} -1) * #{amount, jdbcType=INTEGER}
+        
+      ]]>
+</select> 
+ -->
+
+<!-- <insert id="addBoard" parameterType="com.board.board.BoardVO">
+    <selectKey keyProperty="bid" resultType="int" order="AFTER">
+        SELECT B_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    <![CDATA[
+    INSERT INTO board (btitle, bcontent)
+    VALUES (#{btitle}, #{bcontent})
+    ]]>
+</insert> -->
+
+		
+		
+<!-- <insert id="addBoard" parameterType="com.board.board.BoardVO">
+<![CDATA[
+	INSERT INTO board
+	(bid, bwriter, btitle, bcontent, bregdate, cno)
+	values
+	(#{bid}, #{bwriter}, #{btitle}, #{bcontent}, sysdate, #{cno})
+]]>
+</insert>		  -->
+		
+
+
+</mapper> 

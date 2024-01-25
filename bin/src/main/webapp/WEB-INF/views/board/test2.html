@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+	
+	        /**
+	 * http://usejsdoc.org/
+	 */
+	var BaseNoticeViewApp = function() {
+	
+	var USER_INFO = M.data.storage("USER_INFO");
+	var $baseNoticeViewPopup = $("#baseNoticeViewPopup");
+	var params = $baseNoticeViewPopup.PopupData();
+	//var commentSeqList = [];
+	//var commentSeq=[];
+	//var commentSeq =0;
+	// 현재 날짜를 가져옵니다.
+	var today = new Date();
+	var year = today.getFullYear(); // 연도
+	var month = ('0' + (today.getMonth() + 1)).slice(-2); // 월
+	var day = ('0' + today.getDate()).slice(-2); // 일
+	var dateString = year + month + day;
+	var str = dateString.toString(); // 문자열로 만들기
+	//console.log(dateString);
+	
+	var hours = ('0' + today.getHours()).slice(-2); // 시간
+	var minutes = ('0' + today.getMinutes()).slice(-2); // 분
+	var seconds = ('0' + today.getSeconds()).slice(-2); // 초
+	var getMilliseconds = ('00' + today.getMilliseconds()).slice(-3); // 초
+	// 공백이 있어야 함..
+	var dateString2 = dateString + " " + hours + ':' + minutes + ':' + seconds
+	        + ':' + getMilliseconds;
+	
+	//console.log(dateString2);
+	
+	
+	return {
+	    // 초기함수 호출
+	    init : function() {
+	        // 초기화
+	        init();
+	        
+	        
+	        //console.log('asdasd');
+	        
+	    
+	        // 이벤트 등록
+	        fnEvent();
+	
+	    },
+	}
+	
+	function init() {
+	    
+	    
+	    //fnCommentUpdate();
+	    fnGetSaleOrderRegList();
+	    fnInsertCommentList()
+	}
+	
+	function fnEvent() {
+	    $(".close-btn, button[name=closeBtn]").click(function() {
+	        $baseNoticeViewPopup.PopupClose();
+	    });
+	
+	    // 저장
+	    $("#commentSave").click(function() {
+	        fnInsertCommentInsert();
+	    });
+	    
+	
+	}
+	 //공지사항리스트
+	function fnGetSaleOrderRegList() {
+	
+	    $.indicator.start();
+	
+	    Http.send({
+	                path : '/m/base/notice/view',
+	                data : {
+	                    I_DT_INFO : params.DT_INFO,
+	                    I_INFO_SEQ : params.INFO_SEQ
+	                },
+	                success : function(result) {
+	                    //console.log(result);
+	
+	                    if (result.result_code == "200") {
+	                        if (result.result_info.length > 0) {
+	
+	                            $.each(result.result_info,function(i, v) {
+	
+	                                                var data = result.result_info[i];
+	                                                
+	                                                console.log(data);
+	                                                
+	                                                
+	                                                var $li = $('<div class="flex3 fbold pb10 pt10 bb">'
+	                                                        + '			<div>'
+	                                                        + data.INFO_NAME
+	                                                        + '</div>'
+	                                                        + '</div>'
+	                                                        + '		<div class="text1" style="height: 200px;">'
+	                                                        + data.INFO_DETAIL
+	                                                        + '</div>');
+	
+	                                                $("#noticeView").append($li);
+	                                                
+	                                                
+	                                            
+	                                            });
+	
+	                        } else {
+	                            var $li = $('<li class="none">조회결과가 없습니다.</li>');
+	                            $("#baseNoticeList").append($li);
+	                        }
+	
+	                    } else {
+	                        $.indicator.message(2000, data.result_code
+	                                + "에러 입니다.", function() {
+	                            $.indicator.end();
+	                        });
+	                    }
+	                
+	                    
+	                
+	                }
+	            });
+	    $.indicator.end();
+	}
+	
+	// 댓글 리스트
+	function fnInsertCommentList() {
+	    $.indicator.start();
+	
+	    Http.send({
+	        path : '/m/base/notice/commentList',
+	        data : {
+	            I_DT_INFO : params.DT_INFO,
+	            I_INFO_SEQ : params.INFO_SEQ
+	        },
+	        success : function(result) {
+	            console.log(result);
+	            if (result.result_code == "200") {
+	                
+	
+	                    
+	                    if (result.result_info.length > 0) {
+	                        
+	                        $.each(result.result_info, function(i, v) {
+	                             
+	                             
+	                              var data= result.result_info[i];
+	                              
+	                              var commentSeqArray= data.COMMENT_SEQ; 
+	
+	                               //console.log(commentSeqArray);
+	                                // console.log(data);
+	                              var $li = $('<li>'
+	                                + '   <div class="fs13 flex3 disflex ens">'
+	                                +'<div class="bana" data-seq="'+data.COMMENT_SEQ+'">' +   data.NM_COMMENT+'</div>'
+	                              //+'<div class="bana2" style="display:none;" data-seq="'+data.COMMENT_SEQ+'">' +   data.NM_COMMENT+'</div>'
+	                                +'<div class="flex3">'
+	                               //+' <div class="imgclass3"></div>'
+	                              // +<div class="btn imgclass2" id="commentUpdate"></div>'   onclick="javascript:fnCommentUpdate('+data.COMMENT_SEQ +');"  
+	                                +' <div class="btn imgclass2 edit" id="commentUpdate" data-seq="'+data.COMMENT_SEQ+'"></div>'
+	                                 +' <div class="btn imgclass3 findi" id="commentUpdate" data-seq="'+data.COMMENT_SEQ+'" ></div>'
+	                                +' <div class="imgclass delete2" data-seq="'+data.COMMENT_SEQ+'"></div>'
+	                                +'</div>'
+	                                +'</div>'
+	                                +'<div class="op">'
+	                                +' <div class="flex3 fs13 disflex ">'
+	                                +' <div class="flex3 after">'
+	                                +'<div>소속 </div>'+'<span>'+data.NM_SALES_GROUP +'</span>'
+	                                +'<div>작성자 </div>'+'<span>'+data.NM_PERSON +'</span>'
+	                                +'</div>'
+	                                +' <div class="col">'+ data.DT_COMMENT+'</div>'
+	                        //		+' <input type="hidden"  id="commentSeq" value="'+ data.COMMENT_SEQ+'"></div>'
+	                               +' <input type="hidden"  id="hello'+data.COMMENT_SEQ+'"value="'+ data.COMMENT_SEQ+'"></div>'
+	                                +'</div>'
+	                                +'</div>'
+	                                +'</div>'
+	                                + '</li>');
+	                             
+	        
+	                              $("#baseNoticeView").append($li);
+	                              
+	                            
+	                              $('.btn.imgclass3.findi').hide();
+	                                
+	                              
+	                          });
+	                        
+	                        //클릭하면 댓글순번 갖고 와서 인풋창 보여주기...
+	                        $('#baseNoticeView').on('click', '.edit',function(){
+	                            //console.log(this);
+	                            
+	                            //댓글 순번 갖고오기
+	                            var seq = $(this).data('seq');
+	                            console.log("seq::" + seq);
+	                            //내용사라지고
+	                            $(".bana[data-seq='" + seq + "']").css("display", "none");
+	                            //수정연필버튼 보이기
+	                            $(".findi[data-seq='" + seq + "']").css("display", "inline-block");
+	                            //원래연필버트 안보이게하기
+	                            $(".edit[data-seq='" + seq + "']").css("display", "none");
+	
+	                            //인풋창 보이게하기
+	                            if ($(".bana[data-seq='" + seq + "']").parent().find('input').length === 0) {
+	                                var $input = $('<input type="text" style="width: 300px; height: 25px;" class="textval">');
+	                                $(".bana[data-seq='" + seq + "']").parent().prepend($input);
+	                            }
+	                            
+	                            
+	                            
+	                            
+	                        });
+	                        
+	                        //클릭하면 수정함수 가져오기.
+	                        $('#baseNoticeView').on('click', '.findi',function(){
+	                            var seq = $(this).data('seq');
+	                            console.log("seq::" + seq);
+	                            
+	                            var value =$('.textval').val();
+	                            console.log(value);
+	                            //원래연필버트 안보이게하기
+	                            $(".edit[data-seq='" + seq + "']").css("display", "block");
+	                            
+	                            var $input = $('<div contenteditable="true" style="width: 300px; height: 25px; border: 1px solid #ccc;"></div>');
+	                            $('.textval').replaceWith($input);
+	                            //수정하기로 넘어감
+	                            fnCommentUpdate(seq,value);
+	                            
+	                        });
+	                        
+	                        
+	                        //클릭하면 삭제하기
+	                        $('#baseNoticeView').on('click', '.delete2',function(){
+	                            var seq = $(this).data('seq');
+	                            console.log("seq::" + seq);
+	                            
+	                            Modal.confirm({
+	                                title: '알림',
+	                                buttons:['취소','삭제'],
+	                                msg: "삭제 하시겠습니까?",
+	                                callback:function(){
+	                                
+	                                         //삭제하기로 넘어감
+	                                        fnCommentDelete(seq);
+	                                    
+	                                }
+	                            });
+	                           
+	                            
+	                        });
+	
+	                        
+	                    } else {
+	
+	                        var $li = $('<li class="none">조회결과가 없습니다.</li>');
+	                        $("#baseNoticeView").append($li);
+	                    }
+	                    
+	
+	            } 
+	            
+	            else {
+	                $.indicator.message(2000, data.result_code + "에러 입니다.",
+	                        function() {
+	                            $.indicator.end();
+	
+	                        });
+	            }
+	
+	        },
+	    });
+	    $.indicator.end();
+	}
+	
+	//	//수정
+	
+	
+	// 댓글저장 //저장 할 시에는 프로시저 확인 할것...
+	function fnInsertCommentInsert() {
+	    var deliveryDt = $("#commentVal").val();
+	
+	    $.indicator.start();
+	    Http.send({
+	        path : '/m/base/notice/commentInsert',
+	        data : {
+	            // commentList : DATA_LIST_ARR
+	            I_DT_INFO : params.DT_INFO, // 공지사항 작성일자
+	            I_INFO_SEQ : params.INFO_SEQ, // 공지사항 일련번호
+	            I_CD_INFO : params.CD_INFO, // 공지사항구분
+	            I_INFO_NAME : params.INFO_NAME, // 공지사항 제목
+	            I_DT_COMMENT : str, // 새로저장//댓글 작성일자 //현재일자
+	            I_NM_SALES_GROUP  : params.NM_SALES_GROUP, //부서명
+	            I_CD_SALES_GROUP : params.CD_SALES_GROUP, // 부서코드
+	            I_NO_PERSON : params.NO_PERSON, // 사원코드
+	            I_NM_PERSON :   params.NM_PERSON, //사원명
+	            I_NM_COMMENT : deliveryDt, // 댓글내용
+	            I_DT_INSERT : dateString2
+	        // 댓글 상세 일자
+	        },
+	        success : function(result) {
+	            //console.log(result);
+	              //$("#baseNoticeView").empty();
+	            if (result.result_code == "200") {
+	                if (result.O_RESULT_CODE == "OK") {
+	                    console.log(result);
+	                    
+	                    
+	                   //댓글리스트 불러오기
+	                     fnInsertCommentList();
+	                     
+	                } else if (result.O_RESULT_CODE == "ERR") {
+	                    $.indicator.message(2000,result.O_RESULT_MESSAGE, function() {
+	                        $.indicator.end();
+	                    });
+	                }
+	            } else {
+	                $.indicator.message(2000, data.result_code + "에러 입니다.",
+	                        function() {
+	                            $.indicator.end();
+	
+	                        });
+	            }
+	
+	        },
+	    });
+	    $.indicator.end();
+	}// 거래처목표저장 끝
+	
+	
+	
+	
+	
+	//댓글 수정
+	function fnCommentUpdate(commentSeqArray,text) {
+	
+	    console.log(commentSeqArray,text);
+	    $.indicator.start();
+	    Http.send({
+	        path : '/m/base/notice/commentUpdate',
+	        data : {
+	            // commentList : DATA_LIST_ARR
+	            I_DT_INFO : params.DT_INFO, // 공지사항 작성일자
+	            I_INFO_SEQ : params.INFO_SEQ, // 공지사항 일련번호
+	            I_DT_COMMENT:str, // 댓글 작성일자
+	            I_COMMENT_SEQ : commentSeqArray, // 공지사항 제목
+	            I_CD_SALES_GROUP : params.CD_SALES_GROUP, // 부서코드
+	            I_NM_SALES_GROUP  : params.NM_SALES_GROUP, //부서명
+	            I_NO_PERSON : params.NO_PERSON, // 사원코드
+	            I_NM_PERSON :   params.NM_PERSON, //사원명
+	            I_NM_COMMENT : text, // 댓글내용
+	            I_DT_INSERT : dateString2
+	        // 댓글 상세 일자
+	        },
+	        success : function(result) {
+	            //console.log(result);
+	              //$("#baseNoticeView").empty();
+	            if (result.result_code == "200") {
+	                if (result.O_RESULT_CODE == "OK") {
+	                    console.log(result);
+	                   
+	                     fnInsertCommentList();
+	                     
+	                } else if (result.O_RESULT_CODE == "ERR") {
+	                    $.indicator.message(2000,result.O_RESULT_MESSAGE, function() {
+	                        $.indicator.end();
+	                    });
+	                }
+	            } else {
+	                $.indicator.message(2000, data.result_code + "에러 입니다.",
+	                        function() {
+	                            $.indicator.end();
+	
+	                        });
+	            }
+	
+	        },
+	    });
+	    $.indicator.end();
+	    
+	};
+	
+	
+	
+	//댓글 삭제
+	function fnCommentDelete(commentSeqArray) {
+	
+	    console.log(commentSeqArray);
+	    $.indicator.start();
+	    Http.send({
+	        path : '/m/base/notice/commentDelete',
+	        data : {
+	            // commentList : DATA_LIST_ARR
+	            I_DT_INFO : params.DT_INFO, // 공지사항 작성일자
+	            I_INFO_SEQ : params.INFO_SEQ, // 공지사항 일련번호
+	            I_COMMENT_SEQ : commentSeqArray // 공지사항 제목
+	        // 댓글 상세 일자
+	        },
+	        success : function(result) {
+	            //console.log(result);
+	              //$("#baseNoticeView").empty();
+	            if (result.result_code == "200") {
+	                if (result.O_RESULT_CODE == "OK") {
+	                    console.log(result);
+	                   
+	                     fnInsertCommentList();
+	                     
+	                } else if (result.O_RESULT_CODE == "ERR") {
+	                    $.indicator.message(2000,result.O_RESULT_MESSAGE, function() {
+	                        $.indicator.end();
+	                    });
+	                }
+	            } else {
+	                $.indicator.message(2000, data.result_code + "에러 입니다.",
+	                        function() {
+	                            $.indicator.end();
+	
+	                        });
+	            }
+	
+	        },
+	    });
+	    $.indicator.end();
+	    
+	};
+	
+	
+	}();
+	
+	/* 필수 선언 부 */
+	$(document).ready(function() {
+	BaseNoticeViewApp.init();
+	});
+
+    </script>
+</body>
+</html>
