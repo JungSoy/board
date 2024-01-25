@@ -94,8 +94,8 @@
 									<li><a href="#">사료</a></li>
 									<li><a href="#">영양제</a></li>
 									<li><a href="#">간식</a></li>
+									<li><a href="#">장난감</a></li>
 									<li><a href="#">옷</a></li>
-<!-- 									<li><a href="#">Django &amp; Python</a></li> -->
 								</ul>
 							</li>
 						<c:if test="${user != null}">
