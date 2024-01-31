@@ -1,6 +1,7 @@
 package com.board.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,11 @@ public class BoardRepositoryImpl implements BoardRepository {
 	@Override
 	public void addFile(FileVO fvo) {
 		this.sqlSessionTemplate.insert("board.addFile", fvo);		
+	}
+
+	@Override
+	public List<Map<String, Object>> getBoardCate() {
+		return this.sqlSessionTemplate.selectList("board.getBoardCate");
 	}
 
 

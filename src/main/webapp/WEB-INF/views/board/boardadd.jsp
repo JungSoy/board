@@ -36,17 +36,24 @@
         
            <div class="col-sm-6">
            <label for=cno class="form-label">카테고리</label>
-		  <select name="cno" id="cno">
-		 	<option value="none" selected>=== 선택 ===</option>
-		    <option value="01">공지</option>
-		    <option value="02">유머</option>
-		    <option value="03">뉴스</option>
-		    <option value="04">정치</option>
-		    <option value="05">국제</option>
-		    <option value="06">사회</option>
-		  </select>
+			<select id="gCateCd" name="gCateCd">								
+				<c:forEach var="gdsCate" items="${goodsCateList}">
+					<option value="${gdsCate.DID}">${gdsCate.DNAME}</option>
+				</c:forEach> 							
+			</select>
+				
+<!-- 		  <select name="cno" id="cno"> -->
+<!-- 		 	<option value="none" selected>=== 선택 ===</option> -->
+<!-- 		    <option value="01">공지</option> -->
+<!-- 		    <option value="02">유머</option> -->
+<!-- 		    <option value="03">뉴스</option> -->
+<!-- 		    <option value="04">정치</option> -->
+<!-- 		    <option value="05">국제</option> -->
+<!-- 		    <option value="06">사회</option> -->
+<!-- 		  </select> -->
            </div> 
 		<br>
+		
 		<div class="col-12">
 		<label></label>
 		</div>

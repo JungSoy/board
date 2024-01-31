@@ -87,7 +87,7 @@
 					<!-- START #fh5co-menu-wrap -->
 					<nav id="fh5co-menu-wrap" role="navigation">
 						<ul class="sf-menu" id="fh5co-primary-menu">
-							<li class="active"><a href="/main">Home</a></li>
+							<li class="active"><a href="/main">홈</a></li>
 							<li>
 								<a href="vacation.html" class="fh5co-sub-ddown">상품</a>
 								<ul class="fh5co-sub-menu">
@@ -99,19 +99,19 @@
 								</ul>
 							</li>
 						<c:if test="${user != null}">
-							<li><a href="/board/boardlistscroll">자유 게시판</a></li>
-							<li><a href="/board/boardlist">후기 게시판</a></li>
+<!-- 							<li><a href="/board/boardlistscroll">자유 게시판</a></li> -->
+							<li><a href="/board/boardlist">자유 게시판</a></li>
 <!-- 							<li><a href="/user/logout">Log out</a></li> -->
-							<li><a id="logoutBtn">Log out</a></li>
+							<li><a id="logoutBtn">로그아웃</a></li>
 						</c:if>
 							
 						<c:if test="${user == null}">
-							<li><a href="/user/login">Log in</a></li>
-							<li><a href="/user/join">Sign up</a></li>
+							<li><a href="/user/login">로그인</a></li>
+							<li><a href="/user/join">회원가입</a></li>
 						</c:if>	 
 						
-						<c:if test="${user.adminck == 1 }">
-                        <li><a href="/admin/main">Admin</a></li>
+						<c:if test="${user.adminck == 0 }">
+                        <li><a href="/admin/main">관리자</a></li>
                     </c:if>
 						</ul>
 					</nav>

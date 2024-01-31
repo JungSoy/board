@@ -1,6 +1,7 @@
 package com.board.board;
 
 import java.util.List;
+import java.util.Map;
 
 import com.board.category.CategoryVO;
 import com.board.reply1.Reply1VO;
@@ -39,5 +40,7 @@ public interface BoardService {
 	List<BoardVO> getExcelList(Criteria cri);
 	
 	List<FileVO> getFileById(int bid);
+	
+	List<Map<String, Object>> getBoardCate();
 	
 }

@@ -37,6 +37,14 @@
   
 </insert>
 
+<!-- board 카테고리 목록 조회 -->
+<select id="getBoardCate" resultType="map">
+	SELECT DID, DNAME
+	  FROM CODEDETAIL
+	 WHERE CID = '200'
+	 ORDER BY DSORT
+</select>
+
 <!-- 파일 업로드 -->
 <!-- <update id="addFile" parameterType="java.util.List"> -->
 <!-- 	<foreach collection="list" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" "> -->

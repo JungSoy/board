@@ -1,6 +1,7 @@
 package com.board.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -148,6 +149,12 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public void addFile(FileVO fvo) {
 		boardRepository.addFile(fvo);
+	}
+
+
+	@Override
+	public List<Map<String, Object>> getBoardCate() {
+		return boardRepository.getBoardCate();
 	}
 
 //	@Override

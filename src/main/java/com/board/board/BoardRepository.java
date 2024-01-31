@@ -1,6 +1,7 @@
 package com.board.board;
 
 import java.util.List;
+import java.util.Map;
 
 import com.board.category.CategoryVO;
 import com.board.reply1.Reply1VO;
@@ -57,6 +58,9 @@ public interface BoardRepository {
 	List<FileVO> getFileById(int bid);
 
 	void addFile(FileVO fvo);
+	
+	//게시판 카테고리 목록 조회
+	List<Map<String, Object>> getBoardCate();
 	
 	
 }

@@ -8,7 +8,7 @@
 	INSERT INTO usertable
 	(userid, uname, pw, uemail, phone, uregdate, adminck, addr1, addr2, addr3, point, money)
 	values
-	(#{userid}, #{uname}, #{pw}, #{uemail}, #{phone}, sysdate, 0, #{addr1}, #{addr2}, #{addr3}, 100000, 5000)
+	(#{userid}, #{uname}, #{pw}, #{uemail}, #{phone}, sysdate, 10, #{addr1}, #{addr2}, #{addr3}, 100000, 5000)
 ]]>
 </insert>
 
