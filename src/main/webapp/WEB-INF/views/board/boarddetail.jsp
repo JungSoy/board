@@ -61,7 +61,7 @@
     <!-- 주 게시물 -->
     <div class="panel panel-default">
       <div class="panel-heading">
-        [ ${pageInfo.cate} ] ${pageInfo.btitle}
+        [ ${pageInfo.dname} ] ${pageInfo.btitle}
          <div class="text-right">
        		   글 번호 : ${pageInfo.bid} | ${pageInfo.userid}
         </div>
@@ -326,6 +326,7 @@
 			var rcontent1 = $("#rcontent1").val();
 			var rwriter1 = $("#rwriter1").val();
 			var bid = $("#bid").val();
+			
 			$.ajax({
 				url : "/reply1/reply1add",
 				data : {
@@ -341,7 +342,7 @@
 				},
 				error : function() {
 					alert("댓글을 입력해주세요.")
-
+	
 				}
 			});
 		}

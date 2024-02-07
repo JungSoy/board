@@ -23,7 +23,7 @@ ol.pagination {
 <br>
 					<div class="row row-mt-8em">
 						<div class="col-md-12 mt-text animate-box" data-animate-effect="fadeInUp">
-							<h2 class="white-color" style="font-size: 60px; font-weight: bold;"><a href="/board/boardlist">자유게시판</a></h2>
+							<h2 class="white-color" style="font-size: 60px; font-weight: bold;"><a href="/board/boardlist">자유 게시판</a></h2>
 						</div>
 						
 					</div>
@@ -49,7 +49,7 @@ ol.pagination {
 				
 				<table class="table">
 					<tr style="background-color: #f5f5f5;">
-						<th class="rn_width">rn</th>
+<!-- 						<th class="rn_width">rn</th> -->
 						<th class="bid_width">번호</th>
 						<th class="userid_width">작성자</th>
 						<th class="cate_width">카테고리</th>
@@ -65,8 +65,8 @@ ol.pagination {
 					<div class="cate_area" style="display: inline-block;">
 						<select name="cno" id="categorySelect">
 							    <option value="0">전체</option> <!-- 전체 카테고리를 나타내는 옵션 -->
-						    <c:forEach items="${categorylist}" var="cate">
-						        <option value="${cate.cno}">${cate.cate}</option>
+						    <c:forEach items="${boardCateList}" var="bCate">
+						        <option value="${bCate.DID}">${bCate.DNAME}</option>
 						    </c:forEach>
 						</select>
 					</div>
@@ -258,10 +258,10 @@ ol.pagination {
 	    for (var i = 0; i < boardlist.length; i++) {
 	        var board = boardlist[i];
 	        boardListHtml += "<tr>";
-	        boardListHtml += "<td>" + board.rn + "</td>";
+// 	        boardListHtml += "<td>" + board.rn + "</td>";
 	        boardListHtml += "<td>" + board.bid + "</td>";
 	        boardListHtml += "<td>" + board.userid + "</td>";
-	        boardListHtml += "<td>" + board.cate + "</td>";
+	        boardListHtml += "<td>" + board.dname + "</td>";
 	        boardListHtml += "<td><a href='/board/boarddetail?bid=" + board.bid + "'>" + board.btitle + "</a></td>";
 	        boardListHtml += "<td>" + formatDate(board.bregdate) + "</td>";
 	        boardListHtml += "<td>" + formatDate(board.bupdate) + "</td>";

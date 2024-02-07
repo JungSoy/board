@@ -61,10 +61,13 @@ public class BoardController {
 
 	//게시글 등록 페이지 이동
 	@RequestMapping(value = "/boardadd", method = RequestMethod.GET)
-		public String addBoardGET() {
+		public String addBoardGET(Model model) {
 			
 			log.info("게시글 등록 페이지 진입");
-
+			 List<Map<String, Object>> boardCate = boardService.getBoardCate(); // getBoardCate() 메서드로 카테고리 목록을 가져옵니다.
+			model.addAttribute("boardCateList", boardCate);// JSP로 카테고리 목록을 전달합니다.
+			log.info("게시판 카테고리 " + boardCate);
+				
 			return "board/boardadd";
 		
 		}
@@ -72,10 +75,10 @@ public class BoardController {
     
     //게시글 등록
        @RequestMapping(value="/boardadd", method = RequestMethod.POST)
-   	public String addBoardPOST(BoardVO bvo, HttpServletRequest request) throws Exception {
+   	public String addBoardPOST(BoardVO bvo, HttpServletRequest request, Model model) throws Exception {
    		
        	log.info("addBoardPOST......" + bvo);
-
+       
        	HttpSession session = request.getSession();
    		UserVO uvo = (UserVO)session.getAttribute("user");
        	
@@ -134,11 +137,17 @@ public class BoardController {
         
         // 검색 조건을 유지하기 위해 필요한 데이터 전달
         model.addAttribute("cri", cri);
-
         
-        List<CategoryVO> categorylist = boardService.getListCate(); // getCategoryList() 메서드로 카테고리 목록을 가져옵니다.
-        model.addAttribute("categorylist", categorylist); // JSP로 카테고리 목록을 전달합니다.
-        log.info("카테고리리스트" + categorylist);
+        //후)카테고리
+        List<Map<String, Object>> boardCate = boardService.getBoardCate(); // getBoardCate() 메서드로 카테고리 목록을 가져옵니다.
+		model.addAttribute("boardCateList", boardCate);// JSP로 카테고리 목록을 전달합니다.
+		
+		log.info("카테고리리스트" + boardCate);
+
+//기존 카테고리(category테이블)        
+//        List<CategoryVO> categorylist = boardService.getListCate(); // getCategoryList() 메서드로 카테고리 목록을 가져옵니다.
+//        model.addAttribute("categorylist", categorylist); // JSP로 카테고리 목록을 전달합니다.
+//        log.info("카테고리리스트" + categorylist);
 
 //카테고리별        model.addAttribute("catepaginglist", boardService.getCatePaging(cri));
 //        model.addAttribute("categorylist", categoryService.getListCate());
@@ -159,56 +168,24 @@ public class BoardController {
     
      }
     
-    /* 무한스크롤 - 게시판 목록 페이지 접속 (페이징 적용)*/
-    @GetMapping("/boardlistscroll")
-    public String boardListScrollGET(Model model, Criteria cri) {
-        
-        log.info("게시판 목록 페이지 진입");
-
-        log.info("cri : " +cri);
-        
-        List<BoardVO> boardlist = boardService.getListPaging(cri);
-        model.addAttribute("boardlist", boardlist);
-        
-        // 검색 조건을 유지하기 위해 필요한 데이터 전달
-        model.addAttribute("cri", cri);
-
-        
-        List<CategoryVO> categorylist = boardService.getListCate(); // getCategoryList() 메서드로 카테고리 목록을 가져옵니다.
-        model.addAttribute("categorylist", categorylist); // JSP로 카테고리 목록을 전달합니다.
-
-//카테고리별        model.addAttribute("catepaginglist", boardService.getCatePaging(cri));
-//        model.addAttribute("categorylist", categoryService.getListCate());
-        
-//        CategoryVO cvo = new CategoryVO();
-//        model.addAttribute("categorylist", cvo);
-        
-        int total = boardService.getTotal(cri);
-        
-        PageMakeVO pageMake = new PageMakeVO(cri, total);
- 
-        model.addAttribute("pageMake", pageMake);
-        
-        System.out.println(pageMake);
-        
-		return "/board/boardlistscroll";
-        
-    
-     }
-    
-    
-    
-    //ajax 게시판 목록(json)
+  //ajax 게시판 목록(json)
     @RequestMapping(value="/getboardlist", method=RequestMethod.GET)
     @ResponseBody // JSON 데이터를 반환
     public Map<String, Object> getBoardList(@RequestParam(defaultValue = "1") int pageNum, Model model, Criteria cri) {
 
-    	//카테고리 데이터
-	   List<CategoryVO> categorylist = boardService.getListCate(); 
-	   model.addAttribute("categorylist", categorylist); 
+    	//전)카테고리 데이터
+//	   List<CategoryVO> categorylist = boardService.getListCate(); 
+//	   model.addAttribute("categorylist", categorylist); 
 
-	   log.info("카테고리" +categorylist );
-    	
+//    	//후)자유 카테고리 데이터
+//    	List<Map<String, Object>> boardCate = boardService.getBoardCate(); // getBoardCate() 메서드로 카테고리 목록을 가져옵니다.
+//		model.addAttribute("boardCateList", boardCate);// JSP로 카테고리 목록을 전달합니다.
+//		
+//		//케어 카테고리 목록
+//		List<Map<String, Object>> careBoardCate = boardService.geCaretBoardCate();
+//		model.addAttribute("careBoardCateList", careBoardCate);
+//		
+		
 	   List<BoardVO> boardlist = boardService.getListPaging(cri);
 	   model.addAttribute("boardlist", boardlist);
 	   
@@ -223,7 +200,8 @@ public class BoardController {
 	    resultMap.put("boardlist", boardlist);
 	    resultMap.put("pageMake", pageMake);
 	    resultMap.put("cri", cri);
-	    resultMap.put("categorylist", categorylist);
+//	    resultMap.put("boardCateList", boardCate);
+//	    resultMap.put("careBoardCateList", careBoardCate);
 	    
 	    return resultMap;
     	
@@ -268,7 +246,7 @@ public class BoardController {
     		cell=row.createCell(cellCount++); 
     		cell.setCellValue(excelBoardList.get(i).getUserid());
     		cell=row.createCell(cellCount++);
-    		cell.setCellValue(excelBoardList.get(i).getCate());
+    		cell.setCellValue(excelBoardList.get(i).getDname());
     		cell=row.createCell(cellCount++);
     		cell.setCellValue(excelBoardList.get(i).getBtitle());
     		cell=row.createCell(cellCount++);
@@ -285,6 +263,151 @@ public class BoardController {
     	//response OutputStream에 엑셀 작성
     	wb.write(response.getOutputStream());
     }
+    
+  	//케어 게시판 : 게시글 등록 페이지 이동
+  	@RequestMapping(value = "/careboardadd", method = RequestMethod.GET)
+	public String addCareBoardGET(Model model) {
+		
+		log.info("게시글 등록 페이지 진입");
+		
+		List<Map<String, Object>> careBoardCate = boardService.geCaretBoardCate();
+		model.addAttribute("careBoardCateList", careBoardCate);
+		log.info("케어 카테고리리스트" + careBoardCate);
+		
+		return "board/careboardadd";
+	
+	}
+
+  
+	//케어 게시판 : 게시글 등록
+	@RequestMapping(value="/careboardadd", method = RequestMethod.POST)
+	public String addCareBoardPOST(BoardVO bvo, HttpServletRequest request, Model model) throws Exception {
+ 		
+     	log.info("addCareBoardPOST......" + bvo);
+     
+     	HttpSession session = request.getSession();
+ 		UserVO uvo = (UserVO)session.getAttribute("user");
+     	
+ 		if(uvo == null) {
+ 			return "/user/login";
+ 		}
+ 		
+ 		boardService.addBoard(bvo);
+ 		
+
+ 		return "redirect:/board/careboard";   		
+ 		
+     }
+     		
+    // 케어 게시판 : 무한스크롤 - 게시판 목록 페이지 접속 (페이징 적용)
+    @GetMapping("/careboard")
+    public String careboardGET(Model model, Criteria cri) {
+        
+        log.info("케어 게시판 목록 페이지 진입");
+
+        log.info("cri : " +cri);
+        
+        List<BoardVO> boardlist = boardService.getCareList(cri);
+        model.addAttribute("boardlist", boardlist);
+        
+        List<Map<String, Object>> careBoardCate = boardService.geCaretBoardCate();
+		model.addAttribute("careBoardCateList", careBoardCate);
+		
+		log.info("케어 카테고리리스트" + careBoardCate);
+		
+        // 검색 조건을 유지하기 위해 필요한 데이터 전달
+        model.addAttribute("cri", cri);
+
+        int total = boardService.getTotal(cri);
+        
+		return "/board/careboard";
+    
+     }
+    
+  //케어 게시판 : ajax 게시판 목록(json)
+    @RequestMapping(value="/getcarelist", method=RequestMethod.GET)
+    @ResponseBody // JSON 데이터를 반환
+    public Map<String, Object> getCareList(@RequestParam(defaultValue = "1") int pageNum, Model model, Criteria cri) {
+
+	   List<BoardVO> boardlist = boardService.getCareList(cri);
+	   model.addAttribute("boardlist", boardlist);
+	   
+	   model.addAttribute("cri", cri);
+	
+//	   int total = boardService.getTotal(cri);
+//
+//	   PageMakeVO pageMake = new PageMakeVO(cri, total);
+//	   model.addAttribute("pageMake", pageMake);
+	   
+	   Map<String, Object> resultMap = new HashMap<>();
+	    resultMap.put("boardlist", boardlist);
+//	    resultMap.put("pageMake", pageMake);
+	    resultMap.put("cri", cri);
+//	    resultMap.put("boardCateList", boardCate);
+//	    resultMap.put("careBoardCateList", careBoardCate);
+	    
+	    return resultMap;
+    	
+    }
+
+    //케어 게시판 : 게시글 목록 엑셀 다운
+    @RequestMapping("/cardExcelDown")
+    public void careExcelDownload(HttpServletResponse response, @ModelAttribute("cri")Criteria cri) throws IOException{
+    	XSSFWorkbook wb=null;
+    	Sheet sheet=null;
+    	Row row=null;
+    	Cell cell=null; 
+    	wb = new XSSFWorkbook();
+    	sheet = wb.createSheet("careBoard");
+    	
+    	List<BoardVO> excelBoardList=boardService.getExcelCareList(cri);
+    	log.info("엑셀다운컨트롤러"+excelBoardList);
+    	log.info("cri...." + cri);
+    	
+    	//첫행   열 이름 표기 
+    	int cellCount=0;
+    	row = sheet.createRow(0); //0번째 행
+    	cell=row.createCell(cellCount++);
+    	cell.setCellValue("번호");
+    	cell=row.createCell(cellCount++);
+    	cell.setCellValue("작성자");
+    	cell=row.createCell(cellCount++);
+    	cell.setCellValue("카테고리");
+    	cell=row.createCell(cellCount++);
+    	cell.setCellValue("제목");
+    	cell=row.createCell(cellCount++);
+    	cell.setCellValue("작성일");
+    	cell=row.createCell(cellCount++);
+    	cell.setCellValue("수정일");
+    	cell=row.createCell(cellCount++);
+    	
+    	for(int i=0; i < excelBoardList.size() ; i++  ) {
+    		row=sheet.createRow(i+1);  // '열 이름 표기'로 0번째 행 만들었으니까 1번째행부터
+    		cellCount=0; //열 번호 초기화
+    		cell=row.createCell(cellCount++);
+    		cell.setCellValue(excelBoardList.get(i).getBid());
+    		cell=row.createCell(cellCount++); 
+    		cell.setCellValue(excelBoardList.get(i).getUserid());
+    		cell=row.createCell(cellCount++);
+    		cell.setCellValue(excelBoardList.get(i).getDname());
+    		cell=row.createCell(cellCount++);
+    		cell.setCellValue(excelBoardList.get(i).getBtitle());
+    		cell=row.createCell(cellCount++);
+    		cell.setCellValue(excelBoardList.get(i).getBregdate());
+    		cell=row.createCell(cellCount++);
+    		cell.setCellValue(excelBoardList.get(i).getBupdate());
+    		cell=row.createCell(cellCount++);
+    		
+    	}
+    	
+    	// 컨텐츠 타입과 파일명 지정
+    	response.setContentType("ms-vnd/excel");
+    	response.setHeader("Content-Disposition", "attachment;filename=boardExcelDown.xlsx");  //파일이름지정.
+    	//response OutputStream에 엑셀 작성
+    	wb.write(response.getOutputStream());
+    }
+    
+    
 
     //게시판 상세조회 -- 어려움...
     @GetMapping("/boarddetail")

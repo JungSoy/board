@@ -1,245 +1,80 @@
 
 <%@ include file="/WEB-INF/header.jsp"%>
-	
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 	<script
   src="https://code.jquery.com/jquery-3.4.1.js"
   integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
   crossorigin="anonymous"></script>
   
+    <!-- 스와이프 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.8.4/swiper-bundle.min.css">
+    <!-- 스와이프 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.8.4/swiper-bundle.min.js"></script>
+    <style>
+	    .swiper-container {
+            width: 100%; /* 스와이퍼 컨테이너 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            overflow: hidden; /* 넘치는 부분 숨기기 */
+        }
+        .swiper-slide {
+          width: 430px; 
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .swiper-slide img{
+			margin-top:30px;
+			width:400px;
+			height:400px;
+		}
+        .thumbImg {
+            max-width: 400px;
+            max-height: 400px;
+             object-fit: contain; /* 이미지 비율 유지 */ 
+        }
+        .swiper-pagination{
+        	margin-top:20px;
+        }
+        
+        .swiper-button-prev, .swiper-button-next {
+		    position: absolute; /* 버튼들의 위치를 설정하기 위해 절대 위치로 설정 */
+		    top: 50%; /* 컨테이너의 중앙에 위치하도록 설정 */
+		    transform: translateY(-50%); /* 세로 중앙 정렬 */
+		    z-index: 10; /* 버튼들을 슬라이드 위에 표시하기 위해 겹침 순서를 설정 */
+		    background-color: rgba(255, 255, 255, 0.5); /* 버튼 배경 색상 설정 */
+		    padding: 10px; /* 버튼 패딩 설정 */
+		    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+		    color: white;
+		  }
+		  
+		  p {
+ 		    text-align: center; /* 내용을 가운데 정렬합니다. */ 
+		    color: black;
+		}
+		  
+  
+    </style>
+    
 		<div class="fh5co-hero">
 			<div class="fh5co-overlay"></div>
 			<div class="fh5co-cover" data-stellar-background-ratio="0.5" style="background-image: url(../resources/images/cover_bg_1.jpg);">
-				<div class="desc">
+<!-- 				<div class="desc"> -->
 					<div class="container">
 						<div class="row">
-							<div class="col-sm-5 col-md-5">
-								<div class="tabulation animate-box">
-
-								  <!-- Nav tabs -->
-								   <ul class="nav nav-tabs" role="tablist">
-								      <li role="presentation" class="active">
-								      	<a href="#flights" aria-controls="flights" role="tab" data-toggle="tab">Flights</a>
-								      </li>
-								      <li role="presentation">
-								    	   <a href="#hotels" aria-controls="hotels" role="tab" data-toggle="tab">Hotels</a>
-								      </li>
-								      <li role="presentation">
-								    	   <a href="#packages" aria-controls="packages" role="tab" data-toggle="tab">Packages</a>
-								      </li>
-								   </ul>
-
-								   <!-- Tab panes -->
-									<div class="tab-content">
-									 <div role="tabpanel" class="tab-pane active" id="flights">
-										<div class="row">
-											<div class="col-xxs-12 col-xs-6 mt">
-												<div class="input-field">
-													<label for="from">From:</label>
-													<input type="text" class="form-control" id="from-place" placeholder="Los Angeles, USA"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<div class="input-field">
-													<label for="from">To:</label>
-													<input type="text" class="form-control" id="to-place" placeholder="Tokyo, Japan"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt alternate">
-												<div class="input-field">
-													<label for="date-start">Check In:</label>
-													<input type="text" class="form-control" id="date-start" placeholder="mm/dd/yyyy"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt alternate">
-												<div class="input-field">
-													<label for="date-end">Check Out:</label>
-													<input type="text" class="form-control" id="date-end" placeholder="mm/dd/yyyy"/>
-												</div>
-											</div>
-											<div class="col-sm-12 mt">
-												<section>
-													<label for="class">Class:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>Economy</option>
-														<option value="economy">Economy</option>
-														<option value="first">First</option>
-														<option value="business">Business</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<section>
-													<label for="class">Adult:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="1">1</option>
-														<option value="2">2</option>
-														<option value="3">3</option>
-														<option value="4">4</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<section>
-													<label for="class">Children:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="1">1</option>
-														<option value="2">2</option>
-														<option value="3">3</option>
-														<option value="4">4</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xs-12">
-												<input type="submit" class="btn btn-primary btn-block" value="Search Flight">
-											</div>
-										</div>
-									 </div>
-
-									 <div role="tabpanel" class="tab-pane" id="hotels">
-									 	<div class="row">
-											<div class="col-xxs-12 col-xs-12 mt">
-												<div class="input-field">
-													<label for="from">City:</label>
-													<input type="text" class="form-control" id="from-place" placeholder="Los Angeles, USA"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt alternate">
-												<div class="input-field">
-													<label for="date-start">Return:</label>
-													<input type="text" class="form-control" id="date-start" placeholder="mm/dd/yyyy"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt alternate">
-												<div class="input-field">
-													<label for="date-end">Check Out:</label>
-													<input type="text" class="form-control" id="date-end" placeholder="mm/dd/yyyy"/>
-												</div>
-											</div>
-											<div class="col-sm-12 mt">
-												<section>
-													<label for="class">Rooms:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="economy">1</option>
-														<option value="first">2</option>
-														<option value="business">3</option>
-													</select> 
-												</section>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<section>
-													<label for="class">Adult:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="1">1</option>
-														<option value="2">2</option>
-														<option value="3">3</option>
-														<option value="4">4</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<section>
-													<label for="class">Children:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="1">1</option>
-														<option value="2">2</option>
-														<option value="3">3</option>
-														<option value="4">4</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xs-12">
-												<input type="submit" class="btn btn-primary btn-block" value="Search Hotel">
-											</div>
-										</div>
-									 </div>
-
-									 <div role="tabpanel" class="tab-pane" id="packages">
-									 	<div class="row">
-											<div class="col-xxs-12 col-xs-6 mt">
-												<div class="input-field">
-													<label for="from">City:</label>
-													<input type="text" class="form-control" id="from-place" placeholder="Los Angeles, USA"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<div class="input-field">
-													<label for="from">Destination:</label>
-													<input type="text" class="form-control" id="to-place" placeholder="Tokyo, Japan"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt alternate">
-												<div class="input-field">
-													<label for="date-start">Departs:</label>
-													<input type="text" class="form-control" id="date-start" placeholder="mm/dd/yyyy"/>
-												</div>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt alternate">
-												<div class="input-field">
-													<label for="date-end">Return:</label>
-													<input type="text" class="form-control" id="date-end" placeholder="mm/dd/yyyy"/>
-												</div>
-											</div>
-											<div class="col-sm-12 mt">
-												<section>
-													<label for="class">Rooms:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="economy">1</option>
-														<option value="first">2</option>
-														<option value="business">3</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<section>
-													<label for="class">Adult:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="1">1</option>
-														<option value="2">2</option>
-														<option value="3">3</option>
-														<option value="4">4</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xxs-12 col-xs-6 mt">
-												<section>
-													<label for="class">Children:</label>
-													<select class="cs-select cs-skin-border">
-														<option value="" disabled selected>1</option>
-														<option value="1">1</option>
-														<option value="2">2</option>
-														<option value="3">3</option>
-														<option value="4">4</option>
-													</select>
-												</section>
-											</div>
-											<div class="col-xs-12">
-												<input type="submit" class="btn btn-primary btn-block" value="Search Packages">
-											</div>
-										</div>
-									 </div>
-									</div>
-
+								<div class="container" style="margin: 40px auto;">
+								<p></p>
+<!-- 									<p>강아지 커뮤니티 & 쇼핑몰</p> -->
 								</div>
-							</div>
-							<div class="desc2 animate-box">
-								<div class="col-sm-7 col-sm-push-1 col-md-7 col-md-push-1">
-									<p>HandCrafted by <a href="http://frehtml5.co/" target="_blank" class="fh5co-site-name">FreeHTML5.co</a></p>
-									<h2>Exclusive Limited Time Offer</h2>
-									<h3>Fly to Hong Kong via Los Angeles, USA</h3>
-									<span class="price">$599</span>
-									<!-- <p><a class="btn btn-primary btn-lg" href="#">Get Started</a></p> -->
-								</div>
-							</div>
+							  <div class="swiper-container">
+							        <div class="swiper-wrapper"> </div>
+							        <div class="swiper-pagination"></div>
+							        <div class="swiper-button-prev"></div>
+							        <div class="swiper-button-next"></div>
+							   </div>
 						</div>
 					</div>
-				</div>
+<!-- 				</div> -->
 			</div>
 
 		</div>
@@ -248,8 +83,8 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2 text-center heading-section animate-box">
-						<h3>Hot Tours</h3>
-						<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+						<h3>이번 달 TOP3</h3>
+						<p>이번 달 가장 많이 판매된 상품 세가지</p>
 					</div>
 				</div>
 				<div class="row">
@@ -287,297 +122,60 @@
 						</div>
 					</div>
 					<div class="col-md-12 text-center animate-box">
-						<p><a class="btn btn-primary btn-outline btn-lg" href="#">See All Offers <i class="icon-arrow-right22"></i></a></p>
+						<p><a class="btn btn-primary btn-outline btn-lg" href="#">전체 상품 보기<i class="icon-arrow-right22"></i></a></p>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div id="fh5co-features">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-4 animate-box">
 
-						<div class="feature-left">
-							<span class="icon">
-								<i class="icon-hotairballoon"></i>
-							</span>
-							<div class="feature-copy">
-								<h3>Family Travel</h3>
-								<p>Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit.</p>
-								<p><a href="#">Learn More</a></p>
-							</div>
-						</div>
+<script>
 
-					</div>
+  $(document).ready(function(){
+            // 이미지 파일 경로 배열
+            var imagePaths = [
+            	'../resources/static/img/s1.jpg',
+                '../resources/static/img/s2.jpg',
+                '../resources/static/img/s3.jpg',
+                '../resources/static/img/s4.jpg',
+                '../resources/static/img/s5.jpg',
+                '../resources/static/img/s6.jpg',
+                '../resources/static/img/s7.jpg'
+                // 추가 이미지 파일 경로를 여기에 추가할 수 있습니다.
+            ];
 
-					<div class="col-md-4 animate-box">
-						<div class="feature-left">
-							<span class="icon">
-								<i class="icon-search"></i>
-							</span>
-							<div class="feature-copy">
-								<h3>Travel Plans</h3>
-								<p>Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit.</p>
-								<p><a href="#">Learn More</a></p>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-4 animate-box">
-						<div class="feature-left">
-							<span class="icon">
-								<i class="icon-wallet"></i>
-							</span>
-							<div class="feature-copy">
-								<h3>Honeymoon</h3>
-								<p>Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit.</p>
-								<p><a href="#">Learn More</a></p>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-4 animate-box">
+            // 이미지 슬라이드 동적 생성
+            imagePaths.forEach(function (path) {
+                var slide = '<div class="swiper-slide">' +
+                                '<img class="thumbImg" src="' + path + '">' +
+                            '</div>';
+                $('.swiper-wrapper').append(slide);
+            });
 
-						<div class="feature-left">
-							<span class="icon">
-								<i class="icon-wine"></i>
-							</span>
-							<div class="feature-copy">
-								<h3>Business Travel</h3>
-								<p>Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit.</p>
-								<p><a href="#">Learn More</a></p>
-							</div>
-						</div>
+            // 스와이프 설정
+            var swiper = new Swiper('.swiper-container', {
+                // 옵션 설정
+            	loop: true, // 슬라이드 반복 여부
+                slidesPerView: 3, // 한 번에 보여지는 슬라이드 개수
+                spaceBetween: 50, // 슬라이드 간격
+                autoplay: {
+                    delay: 2000, // 확인 때문에 3초로 변경
+                    pauseOnMouseEnter: true, // 마우스 호버 시 일시 정지
+                    disableOnInteraction: false, // 사용자 상호작용 후에도 자동 재생 유지
+                },
+                pagination: {
+        		    el: '.swiper-pagination',
+        		    clickable: true
+        		  },
+        		  navigation: {
+        		    nextEl: '.swiper-button-next',
+        		    prevEl: '.swiper-button-prev',
+        		  }
+            });
+        });
+  
 
-					</div>
-
-					<div class="col-md-4 animate-box">
-						<div class="feature-left">
-							<span class="icon">
-								<i class="icon-genius"></i>
-							</span>
-							<div class="feature-copy">
-								<h3>Solo Travel</h3>
-								<p>Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit.</p>
-								<p><a href="#">Learn More</a></p>
-							</div>
-						</div>
-
-					</div>
-					<div class="col-md-4 animate-box">
-						<div class="feature-left">
-							<span class="icon">
-								<i class="icon-chat"></i>
-							</span>
-							<div class="feature-copy">
-								<h3>Explorer</h3>
-								<p>Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit.</p>
-								<p><a href="#">Learn More</a></p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		
-		<div id="fh5co-destination">
-			<div class="tour-fluid">
-				<div class="row">
-					<div class="col-md-12">
-						<ul id="fh5co-destination-list" class="animate-box">
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-1.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Los Angeles</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-2.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Hongkong</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-3.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Italy</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-4.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Philippines</h2>
-									</div>
-								</a>
-							</li>
-
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-5.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Japan</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-half text-center">
-								<div class="title-bg">
-									<div class="case-studies-summary">
-										<h2>Most Popular Destinations</h2>
-										<span><a href="#">View All Destinations</a></span>
-									</div>
-								</div>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-6.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Paris</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-7.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Singapore</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-8.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Madagascar</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-9.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Egypt</h2>
-									</div>
-								</a>
-							</li>
-							<li class="one-forth text-center" style="background-image: url(../resources/images/place-10.jpg); ">
-								<a href="#">
-									<div class="case-studies-summary">
-										<h2>Indonesia</h2>
-									</div>
-								</a>
-							</li>
-						</ul>		
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div id="fh5co-blog-section" class="fh5co-section-gray">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-8 col-md-offset-2 text-center heading-section animate-box">
-						<h3>Recent From Blog</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit est facilis maiores, perspiciatis accusamus asperiores sint consequuntur debitis.</p>
-					</div>
-				</div>
-			</div>
-			<div class="container">
-				<div class="row row-bottom-padded-md">
-					<div class="col-lg-4 col-md-4 col-sm-6">
-						<div class="fh5co-blog animate-box">
-							<a href="#"><img class="img-responsive" src="../resources/images/place-1.jpg" alt=""></a>
-							<div class="blog-text">
-								<div class="prod-title">
-									<h3><a href="#">30% Discount to Travel All Around the World</a></h3>
-									<span class="posted_by">Sep. 15th</span>
-									<span class="comment"><a href="">21<i class="icon-bubble2"></i></a></span>
-									<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-									<p><a href="#">Learn More...</a></p>
-								</div>
-							</div> 
-						</div>
-					</div>
-					<div class="col-lg-4 col-md-4 col-sm-6">
-						<div class="fh5co-blog animate-box">
-							<a href="#"><img class="img-responsive" src="../resources/images/place-2.jpg" alt=""></a>
-							<div class="blog-text">
-								<div class="prod-title">
-									<h3><a href="#">Planning for Vacation</a></h3>
-									<span class="posted_by">Sep. 15th</span>
-									<span class="comment"><a href="">21<i class="icon-bubble2"></i></a></span>
-									<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-									<p><a href="#">Learn More...</a></p>
-								</div>
-							</div> 
-						</div>
-					</div>
-					<div class="clearfix visible-sm-block"></div>
-					<div class="col-lg-4 col-md-4 col-sm-6">
-						<div class="fh5co-blog animate-box">
-							<a href="#"><img class="img-responsive" src="../resources/images/place-3.jpg" alt=""></a>
-							<div class="blog-text">
-								<div class="prod-title">
-									<h3><a href="#">Visit Tokyo Japan</a></h3>
-									<span class="posted_by">Sep. 15th</span>
-									<span class="comment"><a href="">21<i class="icon-bubble2"></i></a></span>
-									<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-									<p><a href="#">Learn More...</a></p>
-								</div>
-							</div> 
-						</div>
-					</div>
-					<div class="clearfix visible-md-block"></div>
-				</div>
-
-				<div class="col-md-12 text-center animate-box">
-					<p><a class="btn btn-primary btn-outline btn-lg" href="#">See All Post <i class="icon-arrow-right22"></i></a></p>
-				</div>
-
-			</div>
-		</div>
-		<!-- fh5co-blog-section -->
-		<div id="fh5co-testimonial" style="background-image:url(../resources/images/cover_bg_1.jpg);">
-		<div class="container">
-			<div class="row animate-box">
-				<div class="col-md-8 col-md-offset-2 text-center fh5co-heading">
-					<h2>Happy Clients</h2>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-4">
-					<div class="box-testimony animate-box">
-						<blockquote>
-							<span class="quote"><span><i class="icon-quotes-right"></i></span></span>
-							<p>&ldquo;Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.&rdquo;</p>
-						</blockquote>
-						<p class="author">John Doe, CEO <a href="http://freehtml5.co/" target="_blank">FREEHTML5.co</a> <span class="subtext">Creative Director</span></p>
-					</div>
-					
-				</div>
-				<div class="col-md-4">
-					<div class="box-testimony animate-box">
-						<blockquote>
-							<span class="quote"><span><i class="icon-quotes-right"></i></span></span>
-							<p>&ldquo;Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.&rdquo;</p>
-						</blockquote>
-						<p class="author">John Doe, CEO <a href="http://freehtml5.co/" target="_blank">FREEHTML5.co</a> <span class="subtext">Creative Director</span></p>
-					</div>
-					
-					
-				</div>
-				<div class="col-md-4">
-					<div class="box-testimony animate-box">
-						<blockquote>
-							<span class="quote"><span><i class="icon-quotes-right"></i></span></span>
-							<p>&ldquo;Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.&rdquo;</p>
-						</blockquote>
-						<p class="author">John Doe, Founder <a href="#">FREEHTML5.co</a> <span class="subtext">Creative Director</span></p>
-					</div>
-					
-				</div>
-			</div>
-		</div>
-	</div>
+</script>
 	
 	<%@ include file="/WEB-INF/footer.jsp"%>		
 

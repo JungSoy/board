@@ -3,14 +3,20 @@
 <mapper namespace="reply1">
 		
 <!-- 댓글 등록 -->		
-	<insert id="addReply1" parameterType="hashMap">
-		  <selectKey keyProperty="rid1" resultType="java.lang.Integer" order="BEFORE">
-		    SELECT R1_SEQ.NEXTVAL FROM DUAL
-		  </selectKey>
-		  INSERT INTO reply1 (rid1, bid, rwriter1, rcontent1, rregdate1)
-		  VALUES (#{rid1}, #{bid}, #{rwriter1}, #{rcontent1}, sysdate)
-	</insert>
+<insert id="addReply1" parameterType="hashMap">
+	  INSERT INTO reply1 (bid, rwriter1, rcontent1, rregdate1)
+	  VALUES (#{bid}, #{rwriter1}, #{rcontent1}, sysdate)
+</insert>
 	
+<!-- (시퀀스)댓글 등록 -->
+<!-- 	<insert id="addReply1" parameterType="hashMap"> -->
+<!-- 		  <selectKey keyProperty="rid1" resultType="java.lang.Integer" order="BEFORE"> -->
+<!-- 		    SELECT R1_SEQ.NEXTVAL FROM DUAL -->
+<!-- 		  </selectKey> -->
+<!-- 		  INSERT INTO reply1 (rid1, bid, rwriter1, rcontent1, rregdate1) -->
+<!-- 		  VALUES (#{rid1}, #{bid}, #{rwriter1}, #{rcontent1}, sysdate) -->
+<!-- 	</insert> -->
+
 <!-- 댓글 조회 -->
 <select id="select_reply1" parameterType="String"
 		resultType="com.board.reply1.Reply1VO">

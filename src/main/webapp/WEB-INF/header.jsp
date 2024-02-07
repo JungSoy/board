@@ -84,6 +84,7 @@
 				<div class="nav-header">
 					<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle dark"><i></i></a>
 					<h1 id="fh5co-logo"><a href="/main"><i class="icon-airplane"></i>멍더랜드</a></h1>
+					
 					<!-- START #fh5co-menu-wrap -->
 					<nav id="fh5co-menu-wrap" role="navigation">
 						<ul class="sf-menu" id="fh5co-primary-menu">
@@ -92,15 +93,16 @@
 								<a href="vacation.html" class="fh5co-sub-ddown">상품</a>
 								<ul class="fh5co-sub-menu">
 									<li><a href="#">사료</a></li>
-									<li><a href="#">영양제</a></li>
 									<li><a href="#">간식</a></li>
 									<li><a href="#">장난감</a></li>
-									<li><a href="#">옷</a></li>
+<!-- 									<li><a href="#">영양제</a></li> -->
+<!-- 									<li><a href="#">옷</a></li> -->
 								</ul>
 							</li>
 						<c:if test="${user != null}">
-<!-- 							<li><a href="/board/boardlistscroll">자유 게시판</a></li> -->
 							<li><a href="/board/boardlist">자유 게시판</a></li>
+							<li><a href="/board/careboard">케어 게시판</a></li>
+							<li><a href="/user/mypage">마이페이지</a></li>
 <!-- 							<li><a href="/user/logout">Log out</a></li> -->
 							<li><a id="logoutBtn">로그아웃</a></li>
 						</c:if>

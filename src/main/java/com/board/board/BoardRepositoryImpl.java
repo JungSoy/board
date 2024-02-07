@@ -67,15 +67,15 @@ public class BoardRepositoryImpl implements BoardRepository {
 		return this.sqlSessionTemplate.selectOne("board.getTotal", cri);
 	}
 
-	@Override
-	public List<CategoryVO> getListCate() {
-		return this.sqlSessionTemplate.selectList("board.select_listcate");
-	}
+//	@Override
+//	public List<CategoryVO> getListCate() {
+//		return this.sqlSessionTemplate.selectList("board.select_listcate");
+//	}
 
-	@Override
-	public List<BoardVO> getBoardByCategory(Criteria cri) {
-		return this.sqlSessionTemplate.selectList("board.select_catepaging", cri);
-	}
+//	@Override
+//	public List<BoardVO> getBoardByCategory(Criteria cri) {
+//		return this.sqlSessionTemplate.selectList("board.select_catepaging", cri);
+//	}
 
 
 	//게시글 목록 엑셀 다운로드
@@ -83,6 +83,8 @@ public class BoardRepositoryImpl implements BoardRepository {
 	public List<BoardVO> getExcelList(Criteria cri) {
 		return this.sqlSessionTemplate.selectList("board.select_listexcel", cri);
 	}
+	
+	
 
 	@Override
 	public List<FileVO> getFileById(int bid) {
@@ -99,6 +101,22 @@ public class BoardRepositoryImpl implements BoardRepository {
 	public List<Map<String, Object>> getBoardCate() {
 		return this.sqlSessionTemplate.selectList("board.getBoardCate");
 	}
+
+	@Override
+	public List<Map<String, Object>> getCareBoardCate() {
+		return this.sqlSessionTemplate.selectList("board.geCaretBoardCate");
+	}
+
+	@Override
+	public List<BoardVO> getCareList(Criteria cri) {
+		return this.sqlSessionTemplate.selectList("board.care_listpaging", cri);
+	}
+
+	@Override
+	public List<BoardVO> getExcelCareList(Criteria cri) {
+		return this.sqlSessionTemplate.selectList("board.care_listexcel", cri);
+	}
+
 
 
 	

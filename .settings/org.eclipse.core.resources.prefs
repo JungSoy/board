@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/main/java/com/board/jdbc/JdbcTest.java=UTF-8
 encoding//src/main/webapp/WEB-INF/views/board/boardlist.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/main.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/user/join.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/user/login.jsp=UTF-8

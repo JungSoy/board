@@ -30,15 +30,15 @@
 <body>
 <div class="container">
 	<div class="row form-group" ></div>
-	 <form action="/boardadd" id="enroll_form" method="post" enctype="multipart/form-data">
+	 <form action="/careboardadd" id="enroll_form" method="post" enctype="multipart/form-data">
     <input type="hidden" id="userid" name="userid" value="${user.userid}" class="form-control"/>
    <%--  <span>이름 : ${user.userid}</span> --%>
         
            <div class="col-sm-6">
            <label for=cno class="form-label">카테고리</label>
 			<select id="cno" name="cno">								
-				<c:forEach var="bCate" items="${boardCateList}">
-					<option value="${bCate.DID}">${bCate.DNAME}</option>
+				<c:forEach var="cBcate" items="${careBoardCateList}">
+					<option value="${cBcate.DID}">${cBcate.DNAME}</option>
 				</c:forEach> 							
 			</select>
 				
@@ -114,7 +114,7 @@
 	    	if (sms_send()) {
 	
 	        var form = document.getElementById("enroll_form");
-	        form.action = "<c:url value='/board/boardadd'/>";
+	        form.action = "<c:url value='/board/careboardadd'/>";
 	        form.submit();
 	        
 	    	}
@@ -154,7 +154,7 @@
 	// 목록
 	function fn_cancel() {
 	    var form = document.getElementById("enroll_form");
-	    form.action = "<c:url value='/board/boardlist'/>";
+	    form.action = "<c:url value='/board/careboard'/>";
 	    form.submit();
 	}
 	

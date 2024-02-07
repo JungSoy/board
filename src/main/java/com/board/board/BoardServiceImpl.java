@@ -112,15 +112,15 @@ public class BoardServiceImpl implements BoardService {
 		return boardRepository.getTotal(cri);
 	}
 
-	@Override
-	public List<CategoryVO> getListCate() {
-		return boardRepository.getListCate();
-	}
+//	@Override
+//	public List<CategoryVO> getListCate() {
+//		return boardRepository.getListCate();
+//	}
 
-	@Override
-	public List<BoardVO> getBoardByCategory(Criteria cri) {
-		return boardRepository.getBoardByCategory(cri);
-	}
+//	@Override
+//	public List<BoardVO> getBoardByCategory(Criteria cri) {
+//		return boardRepository.getBoardByCategory(cri);
+//	}
 
 	@Override
 	public List<Reply2VO> getReply2ById(int rid1) {
@@ -155,6 +155,24 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public List<Map<String, Object>> getBoardCate() {
 		return boardRepository.getBoardCate();
+	}
+
+
+	@Override
+	public List<Map<String, Object>> geCaretBoardCate() {
+		return boardRepository.getCareBoardCate();
+	}
+
+
+	@Override
+	public List<BoardVO> getCareList(Criteria cri) {
+		return boardRepository.getCareList(cri);
+	}
+
+
+	@Override
+	public List<BoardVO> getExcelCareList(Criteria cri) {
+		return boardRepository.getExcelCareList(cri);
 	}
 
 //	@Override

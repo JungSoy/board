@@ -18,14 +18,17 @@ public interface BoardRepository {
 	//게시글 목록(페이징 적용)
 	List<BoardVO> getListPaging(Criteria cri);
 	
-	//게시글 목록(카테고리 리스트)
-	List<CategoryVO> getListCate();
+	//케어 게시글 목록(페이징 적용)
+	List<BoardVO> getCareList(Criteria cri);
+	
+//	//게시글 목록(카테고리 리스트)
+//	List<CategoryVO> getListCate();
 
 	//게시글 목록(카테고리별 목록)
 //	List<BoardVO> getCatePaging(Criteria cri);
 	
-	//카테고리별 조회
-	List<BoardVO> getBoardByCategory(Criteria cri);
+//	//카테고리별 조회
+//	List<BoardVO> getBoardByCategory(Criteria cri);
 	
 	//게시글 총 개수
 	int getTotal(Criteria cir);
@@ -53,14 +56,20 @@ public interface BoardRepository {
 	
 	//목록 엑셀 다운
 	List<BoardVO> getExcelList(Criteria cri);
+
+	//케어 목록 엑셀 다운
+	List<BoardVO> getExcelCareList(Criteria cri);
 	
 	//파일 조회
 	List<FileVO> getFileById(int bid);
 
 	void addFile(FileVO fvo);
 	
-	//게시판 카테고리 목록 조회
+	//자유 게시판 카테고리 목록 조회
 	List<Map<String, Object>> getBoardCate();
+	
+	//케어 게시판 카테고리 목록 조회
+	List<Map<String, Object>> getCareBoardCate();
 	
 	
 }

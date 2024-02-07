@@ -15,7 +15,9 @@ public interface BoardService {
 	
 	List<BoardVO> getListPaging(Criteria cri);
 	
-	List<CategoryVO> getListCate();
+	List<BoardVO> getCareList(Criteria cri);
+	
+//	List<CategoryVO> getListCate();
 	
 //	List<BoardVO> getCatePaging(Criteria cri);
 	
@@ -33,14 +35,18 @@ public interface BoardService {
 	
 	BoardVO getBidName(int bid);
 	
-	List<BoardVO> getBoardByCategory(Criteria cri);
+//	List<BoardVO> getBoardByCategory(Criteria cri);
 
 	void addFile(FileVO fvo);
 	
 	List<BoardVO> getExcelList(Criteria cri);
 	
+	List<BoardVO> getExcelCareList(Criteria cri);
+	
 	List<FileVO> getFileById(int bid);
 	
 	List<Map<String, Object>> getBoardCate();
+	
+	List<Map<String, Object>> geCaretBoardCate();
 	
 }

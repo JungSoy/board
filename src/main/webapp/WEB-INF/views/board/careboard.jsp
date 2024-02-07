@@ -14,7 +14,7 @@
 <br>
 					<div class="row row-mt-8em">
 						<div class="col-md-12 mt-text animate-box" data-animate-effect="fadeInUp">
-							<h2 class="white-color" style="font-size: 60px; font-weight: bold;"><a href="/board/boardlist">자유게시판 스크롤</a></h2>
+							<h2 class="white-color" style="font-size: 60px; font-weight: bold;"><a href="/board/boardlist">케어 게시판</a></h2>
 						</div>
 						
 					</div>
@@ -31,18 +31,18 @@
 					<div class="row form-group" >
 						<div class="col-md-12">
 						<c:if test="${user.userid != null}">
-							<a href="/board/boardadd"><button type="button" class="btn btn-primary" style="float:right">등록</button></a>
+							<a href="/board/careboardadd"><button type="button" class="btn btn-primary" style="float:right">등록</button></a>
 						</c:if>
-					    <a href="<c:url value='/board/excelDown' />" class="excel_btn" target="_blank" id="excelDown"><button type="button" class="btn btn-primary" style="float:right">엑셀다운</button></a>
+					    <a href="<c:url value='/board/careExcelDown' />" class="excel_btn" target="_blank" id="excelDown"><button type="button" class="btn btn-primary" style="float:right">엑셀다운</button></a>
 						</div>
 					</div>
 					<!-- 카테고리, 키워드 검색 -->
-					<form id="excelForm" action="/board/excelDown" method="post"> 
+					<form id="excelForm" action="/board/careExcelDown" method="post"> 
 					<div class="cate_area" style="display: inline-block;">
 						<select name="cno" id="categorySelect">
 							    <option value="0">전체</option> <!-- 전체 카테고리를 나타내는 옵션 -->
-						    <c:forEach items="${categorylist}" var="cate">
-						        <option value="${cate.cno}">${cate.cate}</option>
+						    <c:forEach items="${careBoardCateList}" var="cBcate">
+						        <option value="${cBcate.DID}">${cBcate.DNAME}</option>
 						    </c:forEach>
 						</select>
 					</div>
@@ -89,6 +89,7 @@
 			</div>
 			
 		</div>
+		<button type="button" class="btn btn-primary" style="float:right" id="topBtn" onclick="scrollToTop()">Top</button>
 		</div>
 		
 <script>
@@ -174,7 +175,7 @@
  		console.log(cno);
  		
 		$.ajax({
-			url:"/board/getboardlist",
+			url:"/board/getcarelist",
 			type:"get",
 			dataType:'json',
 			data:{
@@ -237,7 +238,7 @@
 	        boardListHtml += "<tr>";
 	        boardListHtml += "<td>" + board.bid + "</td>";
 	        boardListHtml += "<td>" + board.userid + "</td>";
-	        boardListHtml += "<td>" + board.cate + "</td>";
+	        boardListHtml += "<td>" + board.dname + "</td>";
 	        boardListHtml += "<td><a href='/board/boarddetail?bid=" + board.bid + "'>" + board.btitle + "</a></td>";
 	        boardListHtml += "<td>" + formatDate(board.bregdate) + "</td>";
 	        boardListHtml += "<td>" + formatDate(board.bupdate) + "</td>";
@@ -319,7 +320,7 @@
     $("#excelDown").click( function(e){
     	if (confirm("목록을 엑셀다운하시겠습니까?")) {
     		
-	 		$(this).attr("href","<c:url value='/board/excelDown' />"+"?"+ $("#excelForm").serialize() );
+	 		$(this).attr("href","<c:url value='/board/careExcelDown' />"+"?"+ $("#excelForm").serialize() );
 //     		var searchData = {
 //     			    type: $("#ex_type").val(),
 //     			    keyword: $("#ex_keyword").val(),
@@ -343,6 +344,20 @@
     	
     	}
 	}); 
+
+  //top 버튼
+    function scrollToTop() {
+    	  $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+    	
+    // top 이벤트 처리
+    $(window).scroll(function() {
+      if ($(this).scrollTop() > 100) {
+        $('#topBtn').fadeIn();
+      } else {
+        $('#topBtn').fadeOut();
+      }
+    });
 
 
 			

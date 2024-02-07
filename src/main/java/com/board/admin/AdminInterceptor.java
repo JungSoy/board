@@ -17,7 +17,7 @@ public class AdminInterceptor implements HandlerInterceptor{
 	    
 		UserVO lvo = (UserVO)session.getAttribute("user");	//세션값 조회
 	
-		if(lvo == null || lvo.getAdminck() == 0) {    // 관리자 계정 아닌 경우
+		if(lvo == null || lvo.getAdminck() != 0) {    // 관리자 계정 아닌 경우
 	            
 			response.sendRedirect("/main");    // 메인페이지로 리다이렉트
 			    
@@ -25,7 +25,7 @@ public class AdminInterceptor implements HandlerInterceptor{
 			    
 		}
 	        
-	        return true;    // 관리자 계정 로그인 경우(lvo != null && lvo.getAdminck() == 1)
+	        return true;    // 관리자 계정 로그인 경우(lvo != null && lvo.getAdminck() == 0)
 	 
 	 
 	

@@ -24,26 +24,36 @@
 		</trim>
 	
 	</sql>
-	
-	
+
+
 <!-- 게시글 등록 -->		
 <insert id="addBoard" parameterType="com.board.board.BoardVO">
-	<selectKey keyProperty="bid" resultType="java.lang.Integer" order="BEFORE">
-    	SELECT B_SEQ.NEXTVAL FROM DUAL
- 	</selectKey>
   
-  INSERT INTO board (bid, userid, btitle, bcontent, bregdate, cno)
-  VALUES (#{bid}, #{userid}, #{btitle}, #{bcontent}, sysdate, #{cno})
+  INSERT INTO board (userid, btitle, bcontent, bregdate, cno)
+  VALUES (#{userid}, #{btitle}, #{bcontent}, sysdate, #{cno})
   
 </insert>
+<!-- board_pk 시퀀스 -->	
+<!-- 	<selectKey keyProperty="bid" resultType="java.lang.Integer" order="BEFORE"> -->
+<!--     	SELECT B_SEQ.NEXTVAL FROM DUAL -->
+<!--  	</selectKey> -->
 
 <!-- board 카테고리 목록 조회 -->
-<select id="getBoardCate" resultType="map">
+<select id="getBoardCate" resultType="hashmap">
 	SELECT DID, DNAME
 	  FROM CODEDETAIL
 	 WHERE CID = '200'
 	 ORDER BY DSORT
 </select>
+
+<!-- careboard 카테고리 목록 조회 -->
+<select id="geCaretBoardCate" resultType="map">
+	SELECT DID, DNAME
+	  FROM CODEDETAIL
+	 WHERE CID = '300'
+	 ORDER BY DSORT
+</select>
+
 
 <!-- 파일 업로드 -->
 <!-- <update id="addFile" parameterType="java.util.List"> -->
@@ -67,25 +77,28 @@
 
 <!-- 게시글 하나 조회 -->
 <select id="select_one" resultType="com.board.board.BoardVO">
-	   
-	 select b.bid, c.cate, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate
-	 from board b, category c 
-	 where b.cno=c.cno and b.bid = #{bid}
  
+	SELECT b.bid, cd.dname, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate
+	FROM board b
+	JOIN codedetail cd ON b.cno = cd.did
+	WHERE b.bid = #{bid}
+	AND (cd.cid = '200' OR cd.cid = '300')
+	
 </select>
 
 <!-- 게시글 수정 -->
-	<update id="update" parameterType="com.board.board.BoardVO">
-				UPDATE board SET
-				btitle = #{btitle}, bcontent = #{bcontent}, bupdate = sysdate, cno = #{cno}
-				WHERE bid = #{bid}
-	</update>
+<update id="update" parameterType="com.board.board.BoardVO">
+			UPDATE board SET
+			btitle = #{btitle}, bcontent = #{bcontent}, bupdate = sysdate, cno = #{cno}
+			WHERE bid = #{bid}
+</update>
+
 <!-- 게시글 삭제 -->
-	<update id="delete" parameterType="com.board.board.BoardVO">
-				UPDATE board SET
-				del = 'y'
-				WHERE bid = #{bid}
-	</update>
+<update id="delete" parameterType="com.board.board.BoardVO">
+			UPDATE board SET
+			del = 'y'
+			WHERE bid = #{bid}
+</update>
 	
 <!-- 게시글 전체 목록(페이징, 카테고리) 1 -->	
 <!-- <select id="select_listpaging" resultType="com.board.board.BoardVO"> -->
@@ -134,27 +147,59 @@
 <!-- </select>  -->
 
 <!--게시물 목록 페이징 에러 수정 후 -->
+<!-- <select id="select_listpaging" resultType="com.board.board.BoardVO"> -->
+<!--     <![CDATA[ -->
+<!--     SELECT d.rn, d.bid, d.btitle, d.bcontent, d.userid, d.bregdate, d.bupdate, d.cate -->
+<!--     FROM ( -->
+        
+<!--         SELECT a.rn, a.bid, a.btitle, a.bcontent, a.userid, a.bregdate, a.bupdate, a.cate -->
+<!--         FROM( -->
+	    
+<!-- 	        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, c.cate -->
+<!-- 	        FROM board b  -->
+<!-- 	        LEFT JOIN category c ON b.cno = c.cno -->
+<!-- 	        WHERE del='n' -->
+<!-- 	        ]]>  -->
+<!-- 	        <if test="cno != null and cno > 0"> -->
+<!-- 	        	AND c.cno = #{cno} -->
+<!-- 	        </if> -->
+<!-- 	        <if test="keyword != null"> -->
+<!-- 	            <include refid="criteria"></include> -->
+<!-- 	        </if> -->
+<!-- 	        <![CDATA[ -->
+<!-- 	         	ORDER BY bid ASC) a -->
+	         	
+<!-- 		WHERE a.rn <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER} -->
+<!-- 		ORDER BY a.bid ASC) d -->
+		
+<!-- 	WHERE d.rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER} -->
+<!-- 	ORDER BY d.bid ASC -->
+<!--     ]]> -->
+<!-- </select>  -->
+
+<!-- 자유 게시물 목록 페이징 : 카테고리 테이블 수정 후 -->
 <select id="select_listpaging" resultType="com.board.board.BoardVO">
     <![CDATA[
-    SELECT d.rn, d.bid, d.btitle, d.bcontent, d.userid, d.bregdate, d.bupdate, d.cate
+    SELECT d.rn, d.bid, d.btitle, d.bcontent, d.userid, d.bregdate, d.bupdate, d.dname
     FROM (
         
-        SELECT a.rn, a.bid, a.btitle, a.bcontent, a.userid, a.bregdate, a.bupdate, a.cate
+        SELECT a.rn, a.bid, a.btitle, a.bcontent, a.userid, a.bregdate, a.bupdate, a.dname
         FROM(
 	    
-	        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, c.cate
+	        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, c.dname
 	        FROM board b 
-	        LEFT JOIN category c ON b.cno = c.cno
-	        WHERE del='n'
+	        INNER JOIN codedetail c ON b.cno = c.did
+	        AND c.cid = '200'
+	        WHERE b.del='n'
 	        ]]> 
 	        <if test="cno != null and cno > 0">
-	        	AND c.cno = #{cno}
+	        	AND b.cno = #{cno}
 	        </if>
 	        <if test="keyword != null">
 	            <include refid="criteria"></include>
 	        </if>
 	        <![CDATA[
-	         	ORDER BY bid ASC) a
+	         	ORDER BY b.bid ASC) a
 	         	
 		WHERE a.rn <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
 		ORDER BY a.bid ASC) d
@@ -164,9 +209,9 @@
     ]]>
 </select> 
 
-<!-- 게시글 전체 목록(엑셀 다운) -->	
+<!-- (excel)자유 게시물 전체 목록 : 카테고리 테이블 수정 후 -->
 <select id="select_listexcel" resultType="com.board.board.BoardVO">
-SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate
+SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.dname
 FROM (
     SELECT bid, btitle, bcontent, userid, bregdate, bupdate, cno
     FROM board 
@@ -178,8 +223,78 @@ FROM (
         <include refid="criteria"></include>
     </if>
 	) b
-INNER JOIN category c ON c.cno=b.cno
+INNER JOIN codedetail c ON c.cid = '200'
+AND c.did=b.cno
+ORDER BY b.bid DESC
 </select> 
+
+<!-- 케어 게시물 목록 페이징 : 카테고리 테이블 수정 후 -->
+<select id="care_listpaging" resultType="com.board.board.BoardVO">
+    <![CDATA[
+    SELECT d.rn, d.bid, d.btitle, d.bcontent, d.userid, d.bregdate, d.bupdate, d.dname
+    FROM (
+        
+        SELECT a.rn, a.bid, a.btitle, a.bcontent, a.userid, a.bregdate, a.bupdate, a.dname
+        FROM(
+	    
+	        SELECT rownum AS rn, bid, btitle, bcontent, userid, bregdate, bupdate, c.dname
+	        FROM board b 
+	        INNER JOIN codedetail c ON b.cno = c.did
+	        AND c.cid = '300'
+	        WHERE b.del='n'
+	        ]]> 
+	        <if test="cno != null and cno > 0">
+	        	AND b.cno = #{cno}
+	        </if>
+	        <if test="keyword != null">
+	            <include refid="criteria"></include>
+	        </if>
+	        <![CDATA[
+	         	ORDER BY b.bid ASC) a
+	         	
+		WHERE a.rn <= #{pageNum, jdbcType=INTEGER} * #{amount, jdbcType=INTEGER}
+		ORDER BY a.bid ASC) d
+		
+	WHERE d.rn > (#{pageNum, jdbcType=INTEGER} - 1) * #{amount, jdbcType=INTEGER}
+	ORDER BY d.bid ASC
+    ]]>
+</select> 
+
+<!-- (excel)케어 게시물 전체 목록 : 카테고리 테이블 수정 후 -->
+<select id="care_listexcel" resultType="com.board.board.BoardVO">
+SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.dname
+FROM (
+    SELECT bid, btitle, bcontent, userid, bregdate, bupdate, cno
+    FROM board 
+    WHERE del='n'
+    <if test="cno != null and cno > 0">
+         AND cno = #{cno}
+    </if>
+    <if test="keyword != null">
+        <include refid="criteria"></include>
+    </if>
+	) b
+INNER JOIN codedetail c ON c.cid = 300
+AND c.did=b.cno
+ORDER BY b.bid DESC
+</select> 
+
+<!-- 게시글 전체 목록(엑셀 다운) -->	
+<!-- <select id="select_listexcel" resultType="com.board.board.BoardVO"> -->
+<!-- SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate -->
+<!-- FROM ( -->
+<!--     SELECT bid, btitle, bcontent, userid, bregdate, bupdate, cno -->
+<!--     FROM board  -->
+<!--     WHERE del='n' -->
+<!--     <if test="cno != null and cno > 0"> -->
+<!--          AND cno = #{cno} -->
+<!--     </if> -->
+<!--     <if test="keyword != null"> -->
+<!--         <include refid="criteria"></include> -->
+<!--     </if> -->
+<!-- 	) b -->
+<!-- INNER JOIN category c ON c.cno=b.cno -->
+<!-- </select>  -->
 
 <!-- <select id="select_listexcel" resultType="com.board.board.BoardVO"> -->
 <!-- 	SELECT b.bid, b.btitle, b.bcontent, b.userid, b.bregdate, b.bupdate, c.cate -->
@@ -223,15 +338,19 @@ INNER JOIN category c ON c.cno=b.cno
 
 
 <!-- 카테고리 조회 -->
-<select id="select_listcate" resultType="com.board.category.CategoryVO">
-	select cno, cate from category
-</select> 
+<!-- <select id="select_listcate" resultType="com.board.category.CategoryVO"> -->
+<!-- 	select cno, cate from category -->
+<!-- </select>  -->
 
 <!-- (수정 후) 게시물 총 개수 -->
  <select id="getTotal" resultType="int">
     
-        SELECT count(*) FROM board
-        WHERE del ='n'
+        SELECT count(*) FROM board b
+		INNER JOIN codedetail cd 
+		ON b.cno = cd.did
+		AND cd.cid = '200'
+        AND del ='n'
+        
         <if test="keyword != null">
         	AND bid > 0 <include refid="criteria"></include> 
         </if>

@@ -39,8 +39,8 @@ public class Reply1Controller {
     }
     
     //댓글 삭제
-  @RequestMapping(value = "/reply1delete", method = RequestMethod.POST)
-  public String deleteReply1POST(Reply1VO r1vo, @RequestParam int bid) {
+	@RequestMapping(value = "/reply1delete", method = RequestMethod.POST)
+	public String deleteReply1POST(Reply1VO r1vo, @RequestParam int bid) {
   	
   	log.info("댓글삭제 bid" + bid);
   	log.info("댓글삭제 컨트롤러" + r1vo);
