@@ -130,8 +130,8 @@
 
 
 <script>
-
   $(document).ready(function(){
+	  
             // 이미지 파일 경로 배열
             var imagePaths = [
             	'../resources/static/img/s1.jpg',
@@ -173,7 +173,6 @@
         		  }
             });
         });
-  
 
 </script>
 	

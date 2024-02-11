@@ -75,7 +75,7 @@ public class BoardController {
     
     //게시글 등록
        @RequestMapping(value="/boardadd", method = RequestMethod.POST)
-   	public String addBoardPOST(BoardVO bvo, HttpServletRequest request, Model model) throws Exception {
+   	public String addBoardPOST(BoardVO bvo, HttpServletRequest request) throws Exception {
    		
        	log.info("addBoardPOST......" + bvo);
        

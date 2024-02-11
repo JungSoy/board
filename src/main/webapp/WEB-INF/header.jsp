@@ -105,6 +105,7 @@
 							<li><a href="/user/mypage">마이페이지</a></li>
 <!-- 							<li><a href="/user/logout">Log out</a></li> -->
 							<li><a id="logoutBtn">로그아웃</a></li>
+							<li><a href="/chat">채팅</a></li>
 						</c:if>
 							
 						<c:if test="${user == null}">

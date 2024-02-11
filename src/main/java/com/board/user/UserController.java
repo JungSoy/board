@@ -180,7 +180,7 @@ public class UserController {
 	        return num;
 	    }
 		
-		// 로그인 
+		// 후) 로그인 
 	    @RequestMapping(value="login.do", method=RequestMethod.POST)
 	    public String loginPOST(HttpServletRequest request, UserVO uvo, RedirectAttributes rttr) throws Exception{
 	        
@@ -216,7 +216,7 @@ public class UserController {
 	        }
 	
 	    	
-//			//기존 로그인
+//			//전) 기존 로그인
 //	        HttpSession session = request.getSession();
 //	        UserVO lvo = userService.loginUser(uvo);
 //	        
@@ -241,7 +241,7 @@ public class UserController {
 			
 		}
 		
-		//비동기방식 로그아웃 메서드 
+		//후) 비동기방식 로그아웃 메서드 
 	    @RequestMapping(value="logout", method=RequestMethod.POST)
 	    @ResponseBody
 	    public void logoutPOST(HttpServletRequest request) throws Exception{
@@ -255,7 +255,7 @@ public class UserController {
 	    }
 	    
 		
-//		//로그아웃
+//		//전) 로그아웃
 //		@RequestMapping(value="logout", method=RequestMethod.GET)
 //	    public String logoutMainGET(HttpServletRequest request) throws Exception{
 //		   log.info("logoutMainGET 진입");
