@@ -31,7 +31,7 @@ public interface BoardRepository {
 //	List<BoardVO> getBoardByCategory(Criteria cri);
 	
 	//게시글 총 개수
-	int getTotal(Criteria cir);
+	int getTotal(Criteria cri);
 	
 	//게시글 조회
 	BoardVO getOne(int bid);

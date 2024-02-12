@@ -8,6 +8,7 @@ import lombok.Data;
 public class Criteria {
 
 	private int cno;
+	private String gcate;
 	
 	// 현재 페이지 
     private int pageNum;

@@ -90,7 +90,7 @@
 						<ul class="sf-menu" id="fh5co-primary-menu">
 							<li class="active"><a href="/main">홈</a></li>
 							<li>
-								<a href="vacation.html" class="fh5co-sub-ddown">상품</a>
+								<a href="/goods/goodslist" class="fh5co-sub-ddown">상품</a>
 								<ul class="fh5co-sub-menu">
 									<li><a href="#">사료</a></li>
 									<li><a href="#">간식</a></li>
@@ -103,9 +103,9 @@
 							<li><a href="/board/boardlist">자유 게시판</a></li>
 							<li><a href="/board/careboard">케어 게시판</a></li>
 							<li><a href="/user/mypage">마이페이지</a></li>
+							<li><a href="/chat">채팅</a></li>
 <!-- 							<li><a href="/user/logout">Log out</a></li> -->
 							<li><a id="logoutBtn">로그아웃</a></li>
-							<li><a href="/chat">채팅</a></li>
 						</c:if>
 							
 						<c:if test="${user == null}">

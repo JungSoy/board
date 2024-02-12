@@ -3,6 +3,9 @@
 <%@ include file="/WEB-INF/header.jsp"%>
 
 <head>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"
+	integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+	crossorigin="anonymous"></script>
 <style>
 
 ol.pagination {
@@ -11,9 +14,6 @@ ol.pagination {
     
 </style>
 </head>
-<script src="https://code.jquery.com/jquery-3.6.3.min.js"
-	integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
-	crossorigin="anonymous"></script>
 
 <header id="gtco-header-sub" class="gtco-cover-sub2 gtco-cover-md" data-stellar-background-ratio="0.5">
 <div class="overlay"></div>
@@ -99,7 +99,7 @@ ol.pagination {
 		</div>
 		</div>
 		
-		<script>
+<script>
 	var currPage = 1;
 //     var moveForm = $("#moveForm");
     $(document).ready(function () {

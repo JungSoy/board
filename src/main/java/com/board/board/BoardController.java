@@ -57,7 +57,6 @@ public class BoardController {
 
 	@Autowired
 	BoardService boardService;
-	CategoryService categoryService;
 
 	//게시글 등록 페이지 이동
 	@RequestMapping(value = "/boardadd", method = RequestMethod.GET)
@@ -318,7 +317,7 @@ public class BoardController {
         // 검색 조건을 유지하기 위해 필요한 데이터 전달
         model.addAttribute("cri", cri);
 
-        int total = boardService.getTotal(cri);
+//        int total = boardService.getTotal(cri);
         
 		return "/board/careboard";
     
